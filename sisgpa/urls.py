@@ -1,4 +1,4 @@
-"""sisgpa URL Configuration
+"""sgpa_project URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.9/topics/http/urls/
@@ -15,7 +15,14 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from sisgpa.views import login_view, index_view
+from django.contrib.auth.views import logout
 
 urlpatterns = [
+    url(r'^$', login_view, name='login-view'),
+    url(r'^home/$', index_view, name='index-view'),
+    url(r'^logout/$', logout, {'next_page': '/'}),
+
+
     url(r'^admin/', admin.site.urls),
 ]

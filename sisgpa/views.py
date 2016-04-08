@@ -41,7 +41,7 @@ def login_view(request):
 def index_view(request):
     if request.user.is_authenticated():
         """
-        si el usuario esta autenticado
+        si el usuario esta autenticado.
         """
         return render(request, 'sisgpa/index.html')
 

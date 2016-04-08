@@ -2,19 +2,29 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 
-
 def login_view(request):
+
+    """
+           Metodo que se encarga de mostrar login en el sistema
+           si el usuario esta autenticado, se le redirige
+           a la vista de index.
+
+           @param  request:Http request
+           @type   request: HttptRequest
+           @return :render al template de login
+    """
+
     if request.user.is_authenticated():
-        """
-        si el usuario esta autenticado, se le redirige
-        a la vista de index, no tiene por que estar aca.
-        """
+
+
         return HttpResponseRedirect('/home/')
+
     else:
 
         """
         si el usuario aun no fue autenticado, se ve si existe algun
         post, sino se renderiza la pagina de inicio de sesion.
+
         """
         if request.method == 'POST':
             username = request.POST['username']
@@ -39,6 +49,14 @@ def login_view(request):
 
 
 def index_view(request):
+    """
+       Metodo que redirecciona a la pagina de inicio si esta autenticado el usuario
+
+       @param request: Http request
+       @type  request: Htttptrequest
+       @return: render al template del index
+    """
+
     if request.user.is_authenticated():
         """
         si el usuario esta autenticado.

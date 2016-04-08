@@ -7,14 +7,14 @@ def login_view(request):
     if request.user.is_authenticated():
         """
         si el usuario esta autenticado, se le redirige
-        a la vista de index, no tiene por que estar aca
+        a la vista de index, no tiene por que estar aca.
         """
         return HttpResponseRedirect('/home/')
     else:
 
         """
         si el usuario aun no fue autenticado, se ve si existe algun
-        post, sino se renderiza la pagina de inicio de sesion
+        post, sino se renderiza la pagina de inicio de sesion.
         """
         if request.method == 'POST':
             username = request.POST['username']
@@ -23,7 +23,7 @@ def login_view(request):
 
             if user is not None:
                 """
-                si el usuario existe
+                si el usuario existe.
                 """
                 if user.is_active:
                     login(request, user)

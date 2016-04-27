@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'guardian',
+    'core',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -86,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'bd_sisgpa',
         'USER': 'postgres',
-        'PASSWORD': 'postgres',
+        'PASSWORD': 'admin',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -124,6 +126,12 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # default
+    'guardian.backends.ObjectPermissionBackend',
+)
 
 
 # Static files (CSS, JavaScript, Images)

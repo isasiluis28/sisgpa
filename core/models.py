@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
 from django.db import models
-from guardian.shortcuts import assign_perm
+from guardian.shortcuts import assign_perm, remove_perm
 
 
 class Proyecto(models.Model):
@@ -60,3 +60,9 @@ class MiembroEquipo(models.Model):
         super(MiembroEquipo, self).save(force_insert, force_update, using, update_fields)
         # se agrega el permiso de view_project al usuario dentro del proyecto hecho
         assign_perm('view_project', self.usuario, self.proyecto)
+
+    def delete(self, using=None, keep_parents=False):
+        for rol in self.roles.all():
+            for perm in rol.permissions.all():
+                remove_perm(perm.codename, self.usuario, self.proyecto)
+        super(MiembroEquipo, self).delete(using, keep_parents)

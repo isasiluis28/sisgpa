@@ -1,0 +1,50 @@
+{% extends 'core/base_table.html' %}
+{% load guardian_tags %}
+
+{% block titulo_pestana %}Proyectos{% endblock %}
+
+{% block before_table %}<h1>Prueba</h1>{% endblock %}
+
+{% block proyectos_activo %}class="active"{% endblock %}
+
+{% block thead %}
+    <th>nombre corto</th>
+    <th>nombre largo</th>
+    <th>estado</th>
+    <th>inicio</th>
+    <th>fin</th>
+    <th></th>
+{% endblock %}
+
+{% block tbody %}
+    {% for p in projects %}
+        {% get_obj_perms request.user for project as 'project_perms' %}
+        <tr>
+            <td>{{ p.nombre_corto|title }}</td>
+            <td>{{ p.nombre_largo|title }}</td>
+            <td>{{ p.get_estado_display }}</td>
+            <td>{{ p.fecha_inicio|date:"SHORT_DATE_FORMAT" }}</td>
+            <td>{{ p.fecha_fin|date:"SHORT_DATE_FORMAT" }}</td>
+            <td>
+                <div class="btn-group" role="group" aria-label="...">
+                    {% if 'view_project' in project_perms %}
+                        <button><a href="#"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a></button>
+                    {% else %}
+                        <button><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
+                    {% endif %}
+                    {% if 'change_project' in project_perms %}
+                        <button><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></button>
+                    {% else %}
+                        <button><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
+                    {% endif %}
+                    {% if 'delete_project' in project_perms %}
+                        <button><a href="#"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></button>
+                    {% else %}
+                        <button><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+
+    {% endfor %}
+{% endblock %}

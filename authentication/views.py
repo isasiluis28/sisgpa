@@ -1,6 +1,6 @@
+from django.contrib.auth import authenticate, login
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
-from django.contrib.auth import authenticate, login, logout
 
 
 def login_view(request):
@@ -19,7 +19,7 @@ def login_view(request):
         si el usuario esta autenticado, se le redirige
         a la vista de index, no tiene por que estar aca
         """
-        return HttpResponseRedirect('/home/')
+        return HttpResponseRedirect('/')
     else:
 
         """
@@ -37,33 +37,12 @@ def login_view(request):
                 """
                 if user.is_active:
                     login(request, user)
-                    return HttpResponseRedirect('/home/')
+                    return HttpResponseRedirect('/')
                 else:
                     mensaje = 'Su cuenta ha sido desabilitada, contacte con el administrador para mayores detalles.'
-                    return render(request, 'sisgpa/login.html', {'mensaje': mensaje})
+                    return render(request, 'authentication/login.html', {'mensaje': mensaje})
             else:
                 mensaje = 'Datos proveidos incorrectos, vuelva a intentar.'
-                return render(request, 'sisgpa/login.html', {'mensaje': mensaje})
+                return render(request, 'authentication/login.html', {'mensaje': mensaje})
 
-        return render(request, 'sisgpa/login.html')
-
-
-def index_view(request):
-
-    """
-       Metodo que redirecciona a la pagina de inicio si esta autenticado el usuario
-
-       @param request: Http request
-       @type  request: Htttptrequest
-       @return: render al template del index
-    """
-
-    if request.user.is_authenticated():
-        """
-        si el usuario esta autenticado
-        """
-        return render(request, 'sisgpa/index.html')
-
-    return HttpResponseRedirect('/')
-
-
+        return render(request, 'authentication/login.html')

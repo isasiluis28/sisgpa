@@ -1,0 +1,39 @@
+{% extends 'authentication/base.html' %}
+{% load i18n bootstrap3 %}
+
+
+{% block titulo_pestana %}Log In{% endblock %}
+
+{% block titulo %}Loguearse{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+        document.getElementById('id_username').focus()
+    </script>
+{% endblock %}
+
+{% block authentication_content %}
+
+    {% if mensaje %}
+        <p class="errornote">{{ mensaje }}</p>
+    {% endif %}
+
+    <form role="form" method="post">{% csrf_token %}
+        <fieldset>
+            <div class="form-group">
+                <input class="form-control" placeholder="username" name="username" type="text" autofocus="">
+            </div>
+            <div class="form-group">
+                <input class="form-control" placeholder="password" name="password" type="password" value="">
+            </div>
+{#							<div class="checkbox">#}
+{#								<label>#}
+{#									<input name="remember" type="checkbox" value="Remember Me">Remember Me#}
+{#								</label>#}
+{#							</div>#}
+            <button type="submit" class="btn btn-primary">Loguearse</button>
+        </fieldset>
+    </form>
+
+
+{% endblock %}

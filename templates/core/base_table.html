@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block inside_extracss %}
+    <link href="{% static 'data_table/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'data_table/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block inside_content %}
+
+    {% block before_table %}{% endblock %}
+    <div class="dataTable_wrapper table-responsive">
+        <table class="table table-striped table-bordered table-hover" id="myTable">
+            <thead>
+                {% block thead %}{% endblock %}
+            </thead>
+            <tbody>
+                {% block tbody %}{% endblock %}
+            </tbody>
+        </table>
+    </div>
+    {% block after_table %}{% endblock %}
+
+{% endblock %}
+
+{% block inside_extrajs  %}
+    <script src="{% static 'datatables/media/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'datatables/media/js/dataTables.bootstrap.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable({
+                responsive: true
+            });
+        });
+    </script>
+{% endblock %}

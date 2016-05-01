@@ -2,8 +2,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic.list import ListView
+from guardian.mixins import PermissionRequiredMixin
 
 from core.models import Proyecto
+
+
+class GlobalPermissionMixin(PermissionRequiredMixin):
+    accept_global_perms = True
+    raise_exception = True
+    return_403 = True
 
 
 def index_view(request):
@@ -39,4 +46,7 @@ class ProjectList(LoginRequiredMixin, ListView):
         return proyectos.exclude(estado='CA')
 
 project_list = ProjectList.as_view()
+
+
+# class ProjectDetail()
 

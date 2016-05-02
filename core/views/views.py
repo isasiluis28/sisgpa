@@ -1,16 +1,21 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic.list import ListView
+
 from guardian.mixins import PermissionRequiredMixin
 
-from core.models import Proyecto
+from core.models import Proyecto, MiembroEquipo
 
 
 class GlobalPermissionMixin(PermissionRequiredMixin):
     accept_global_perms = True
     raise_exception = True
     return_403 = True
+
+
+class CreateViewMixin(GlobalPermissionMixin):
+    def get_object(self):
+        return None
 
 
 def index_view(request):
@@ -32,21 +37,11 @@ def index_view(request):
     return HttpResponseRedirect('/login')
 
 
-class ProjectList(LoginRequiredMixin, ListView):
-    # listado de los proyectos de acuerdo a los permisos de usuario autenticado
-    model = Proyecto
-    context_object_name = 'projects'
-    template_name = 'core/projects/project_list.html'
-
-    def get_queryset(self):
-        if self.request.user.has_perm('core.list_all_projects'):
-            proyectos = Proyecto.objects.all()
-        else:
-            proyectos = self.request.user.proyecto_set
-        return proyectos.exclude(estado='CA')
-
-project_list = ProjectList.as_view()
 
 
-# class ProjectDetail()
+
+
+
+
+
 

@@ -3,9 +3,18 @@
 
 {% block titulo_pestana %}Proyectos{% endblock %}
 
-{% block before_table %}<h1>Prueba</h1>{% endblock %}
-
 {% block proyectos_activo %}class="active"{% endblock %}
+
+
+{% block before_table %}
+    {% if perms.core.add_proyecto %}
+        <ul class="list-inline">
+            <li><a href="{% url 'project_create' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></li>
+        </ul>
+    {% endif %}
+
+{% endblock %}
+
 
 {% block thead %}
     <th>nombre corto</th>
@@ -28,19 +37,19 @@
             <td>
                 <div class="btn-group" role="group" aria-label="...">
                     {% if 'view_project' in project_perms %}
-                        <button><a href="#"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a></button>
+                        <a href="{% url 'project_detail' p.id %}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
                     {% else %}
-                        <button disabled><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></button>
+                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                     {% endif %}
                     {% if 'change_proyecto' in project_perms %}
-                        <button><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></button>
+                        <a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
                     {% else %}
-                        <button disabled><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                     {% endif %}
                     {% if 'delete_proyecto' in project_perms %}
-                        <button><a href="#"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></button>
+                        <a href="#"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
                     {% else %}
-                        <button disabled><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                     {% endif %}
                 </div>
             </td>

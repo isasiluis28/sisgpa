@@ -7,6 +7,57 @@
 {% endblock %}
 
 {% block inside_content %}
+    {% get_obj_perms user for project as "project_perms" %}
+    <h1>{{ project.nombre_largo }}</h1>
 
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-body tabs">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab1" data-toggle="tab">resumen</a></li>
+                    <li class=""><a href="#tab2" data-toggle="tab">descripcion</a></li>
+                    <li class=""><a href="#tab3" data-toggle="tab">mas...</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade active in" id="tab1">
+                        <h4>resumen</h4>
+                        <p><strong>Estado:</strong> {{ project.get_estado_display }}</p>
+                        <p><strong>Fecha de inicio:</strong> {{ project.fecha_inicio }}</p>
+                        <p><strong>Fecha de fin:</strong> {{ project.fecha_fin }}</p>
+                    </div>
+                    <div class="tab-pane fade" id="tab2">
+                        <h4>descripcion</h4>
+                        <p>{{ project.descripcion }}</p>
+                    </div>
+                    <div class="tab-pane fade" id="tab3">
+                        <h4>mas...</h4>
+                        <p><strong>user stories:</strong></p>
+                        <p><strong>user stories(en desarrollo):</strong> 0</p>
+                        <p><strong>user stories(cancelados):</strong> 0</p>
+                        <p><strong>user stories(aprobados):</strong> 0</p>
+                    </div>
+                </div>
+            </div>
+        </div><!--/.panel-->
+    </div>
+
+    <div class="col-md-6">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                Miembros del Equipo
+            </div>
+            <div class="panel-body">
+                {% for miembro in equipo %}
+                    <p>
+                        {{ miembro.usuario }}
+                        {% for rol in miembro.roles.all %}
+                            <span class="badge" title="rol" style="float: right;">{{ rol }}</span>
+                        {% endfor %}
+                    </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

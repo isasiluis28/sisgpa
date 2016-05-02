@@ -1,0 +1,76 @@
+{% extends 'core/rol/base.html' %}
+{% load bootstrap3 %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'rol-index' %}">Roles</a></li>
+    {% if accion == 'editar' %}
+        <li><a href="{% url 'rol_detail' object.id %}">{{ object }}</a></li>
+    {% endif %}
+    <li class="active">{{ accion }}</li>
+{% endblock %}
+
+{% block inside_content %}
+
+    <form action="" method="post" role="form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-group">
+            {{ form.name.errors }}
+            {{ form.name.label_tag }}
+            {{ form.name }}
+
+        </div>
+        <h3>Permisos</h3>
+        <div class="checkbox">
+                     <label for="checkboxall">
+                         <input id="checkboxall" type="checkbox">
+                         </input>
+                         Seleccionar todos
+                     </label>
+                 </div>
+            <div class="row">
+
+                <div class="form-group">
+                    <div class="col-lg-6 permisos-checkboxes">
+                        {% bootstrap_field form.perms_proyecto %}
+                    </div>
+                </div>
+            </div>
+
+        <div class="row">
+             <div class="form-group">
+                <div class="col-lg-4">
+                    <h5>{{ form.perms_user.label_tag }}</h5>
+                    {{ form.perms_user.errors }}
+                    {{ form.perms_user }}
+                </div>
+                <div class="col-lg-4">
+                    <h5>{{ form.perms_group.label_tag }}</h5>
+                    {{ form.perms_group.errors }}
+                    {{ form.perms_group }}
+                </div>
+             </div>
+        </div>
+        <input type="submit" value="{{ accion }}" class="btn btn-default"/>
+    </form>
+
+{% endblock %}
+
+{% block inside_extrajs %}
+    <script type="text/javascript">
+    $(function() {
+  var masterCheckbox = $('#checkboxall');
+    var slaveCheckboxes = $('.permisos-checkboxes').find(':input');
+  masterCheckbox.click(function() {
+      console.log(slaveCheckboxes.length);
+    slaveCheckboxes.prop('checked', masterCheckbox.prop('checked'));
+  });
+  slaveCheckboxes.click(function() {
+      // Check all slave checkboxes selections: in case all are checked - check the master checkbox as well
+      masterCheckbox.prop('checked', $.grep(slaveCheckboxes, function(e) {
+          return $(e).prop('checked');
+      }).length == slaveCheckboxes.length);
+  });
+});
+    </script>
+{%  endblock %}

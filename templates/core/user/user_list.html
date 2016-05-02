@@ -1,0 +1,56 @@
+{% extends 'core/base_table.html' %}
+{% load guardian_tags %}
+
+{% block titulo_pestana %}Usuarios{% endblock %}
+
+{% block usuarios_activo %}class="active"{% endblock %}
+
+{% block before_table %}
+    {% if perms.auth.add_user %}
+        <p><a href="{% url 'user_create' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></p>
+    {% endif %}
+{% endblock %}
+
+{% block thead %}
+    <th>username</th>
+    <th>Nombres</th>
+    <th>Apellidos</th>
+    <th>email</th>
+    <th>Estado</th>
+    <th>Ultimo Login</th>
+    <th></th>
+{% endblock %}
+
+{% block tbody %}
+    {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                {% if user.is_active %}
+                    Activo
+                {% else %}
+                    Inactivo
+                {% endif %}
+            </td>
+            <td>{{ user.last_login }}</td>
+            <td>
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="{% url 'user_detail' user.id %}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
+                    {% if perms.auth.change_user %}
+                        <a href="{% url 'user_update' user.id %}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                    {% else %}
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                    {% endif %}
+                    {% if perms.auth.delete_user %}
+                        <a href="{% url 'user_delete' user.id %}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                    {% else %}
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}

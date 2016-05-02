@@ -1,0 +1,33 @@
+{% extends 'core/base_table.html' %}
+{% block titulo_pestana %}Proyectos{% endblock %}
+
+{% block roles_activo %}class="active"{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="active">Roles</li>
+{% endblock %}
+
+{% block before_table %}
+    {% if perms.auth.add_group %}
+        <p><a href="{% url 'rol_create' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></p>
+    {% endif %}
+{% endblock %}
+
+{% block thead %}
+        <tr>
+            <th width="70%">Nombre</th>
+            <th>Ver</th>
+            {% if perms.auth.change_group %}<th>Editar</th>{% endif %}
+{#            {% if perms.auth.delete_group %}<th>Eliminar</th>{% endif %}#}
+        </tr>
+{% endblock %}
+{% block tbody %}
+        {% for r in roles %}
+        <tr class="odd gradeX">
+            <td>{{ r.name }}</td>
+            <td ><a href="{% url 'rol_detail' r.id %}"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a></td>
+            {% if perms.auth.change_group %}<td><a href="{% url 'rol_update' r.id %}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>{% endif %}
+{#            {% if perms.auth.delete_group %}<td><a href="#"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></td>{% endif %}#}
+        </tr>
+        {% endfor %}
+{% endblock %}

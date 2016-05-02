@@ -1,0 +1,20 @@
+{% extends 'core/user/base.html' %}
+
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'user-index' %}">Usuarios</a></li>
+    <li><a href="{% url 'user_detail' object.id %}">{{ object.username }}</a></li>
+    <li class="active">Eliminar</li>
+{% endblock %}
+
+{% block inside_content %}
+    <h1>Eliminar Usuario</h1>
+    <form action="" method="post" role="form">
+        {% csrf_token %}
+        <div class="form-group">
+            <p>Seguro de que desea eliminar el usuario <strong>{{ usuario }}</strong>?</p>
+        </div>
+
+        <input type="submit" value="Confirmar" class="btn btn-danger"/>
+    </form>
+{% endblock %}

@@ -20,6 +20,10 @@ def __general_perms_list__():
 
 
 def __user_and_group_permissions__():
+    """
+    perimisos de grupos de usuarios
+    :return: lista con los permisos que pueden asignarse a usuarios
+    """
     perms_user_list = [(perm.codename, perm.name) for perm in get_perms_for_model(User)]
     perms_group_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Group)]
     perms = []

@@ -42,12 +42,12 @@
                         <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                     {% endif %}
                     {% if 'change_proyecto' in project_perms %}
-                        <a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                        <a href="{% url 'project_update' p.id %}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
                     {% else %}
                         <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                     {% endif %}
                     {% if 'delete_proyecto' in project_perms %}
-                        <a href="#"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
+                        <a href="{% url 'project_delete' p.id %}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a>
                     {% else %}
                         <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                     {% endif %}

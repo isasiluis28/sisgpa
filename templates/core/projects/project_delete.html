@@ -1,0 +1,19 @@
+{% extends 'core/projects/base.html' %}
+
+{% block breadcrumbs %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{% url 'project_detail' proyecto.id %}">{{ proyecto.nombre_corto }}</a></li>
+    <li class="active">Cancelar</li>
+{% endblock %}
+
+{% block inside_content %}
+    <form action="" method="post" role="form">
+        {% csrf_token %}
+        <div class="form-group">
+            <p>Seguro de que desea cancelar el proyecto <strong>{{ object }}</strong>?</p>
+        </div>
+
+        <input type="submit" value="Confirmar" class="btn btn-danger"/>
+        <a href="javascript:history.back()"><button type="button" class="btn btn-default">Cancelar</button></a>
+    </form>
+{% endblock %}

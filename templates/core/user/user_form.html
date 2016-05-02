@@ -1,0 +1,40 @@
+{% extends 'core/user/base.html' %}
+{% load bootstrap3 %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'user-index' %}">Usuarios</a></li>
+    {% if current_action == 'editar' %}
+        <li><a href="{% url 'user_detail' object.id %}">{{ object.get_full_name }}</a></li>
+    {% endif %}
+    <li class="active">{{ current_action }}</li>
+{% endblock %}
+
+{% block inside_content %}
+    <form role="form" method="post" action="">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-lg-6">
+                {% bootstrap_field form.first_name %}
+                {% bootstrap_field form.last_name %}
+                {% bootstrap_field form.email %}
+                {% bootstrap_field form.username %}
+                {% if form.password1 %}
+                    {% bootstrap_field form.password1 %}
+                    {% bootstrap_field form.password2 %}
+                {% endif %}
+                {% if current_action == 'editar' and not object.is_active %}
+                    {% bootstrap_field form.is_active layout='inline'%}
+                {% endif %}
+            </div>
+            <div class="col-lg-6">
+                {% bootstrap_field form.general_perms %}
+            </div>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a href="javascript:history.back()">
+                <button type="button" class="btn btn-danger">Cancelar</button>
+            </a>
+        </div>
+    </form>
+{% endblock %}

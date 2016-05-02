@@ -7,6 +7,14 @@
 {% endblock %}
 
 {% block inside_content %}
+    <ul class="list-inline">
+        {% if perms.auth.change_user %}
+            <li><a href="{% url 'user_update' usuario.id %}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></li>
+        {% endif %}
+         {% if perms.auth.delete_user %}
+            <li><a href="{% url 'user_delete' usuario.id %}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></li>
+        {% endif %}
+    </ul>
     <h1>{{ usuario|title }}</h1>
 
     <p><strong>Nombre:</strong> {{ usuario.first_name }}</p>
@@ -14,36 +22,40 @@
     <p><strong>Username:</strong> {{ usuario.username }}</p>
     <p><strong>Email:</strong> {{ usuario.email }}</p>
     <h3>Proyectos</h3>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel-group" id="accordion">
-                {% for p in projects %}
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter }}" aria-expanded="false"
-                               class="collapsed">{{ p.proyecto.nombre_corto }}
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
-                        <div class="panel-body">
-                            <strong>Roles: </strong>
-                            {% for r in p.roles.all %}
-                                <span class="label label-primary">{{ r }}</span>
-                            {% endfor %}
-                                <ul class="list-inline">
-                                    <li><strong>Estado: </strong>{{ p.proyecto.get_estado_display }}</li>
-                                    <li><strong>Inicio: </strong>{{ p.proyecto.fecha_inicio|date }}</li>
-                                    <li><strong>Fin: </strong>{{ p.proyecto.fecha_fin|date }}</li>
-                                </ul>
-                                <p>{{ p.proyecto.descripcion }}</p>
-                            <a href="{% url 'project_detail' p.proyecto_id %}" class="btn btn-primary btn-sm">Ver Más</a>
+    {% if projects %}
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel-group" id="accordion">
+                    {% for p in projects %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{ forloop.counter }}" aria-expanded="false"
+                                   class="collapsed">{{ p.proyecto.nombre_corto }}
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
+                            <div class="panel-body">
+                                <strong>Roles: </strong>
+                                {% for r in p.roles.all %}
+                                    <span class="label label-primary">{{ r }}</span>
+                                {% endfor %}
+                                    <ul class="list-inline">
+                                        <li><strong>Estado: </strong>{{ p.proyecto.get_estado_display }}</li>
+                                        <li><strong>Inicio: </strong>{{ p.proyecto.fecha_inicio|date }}</li>
+                                        <li><strong>Fin: </strong>{{ p.proyecto.fecha_fin|date }}</li>
+                                    </ul>
+                                    <p>{{ p.proyecto.descripcion }}</p>
+                                <a href="{% url 'project_detail' p.proyecto_id %}" class="btn btn-primary btn-sm">Ver Más</a>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
         </div>
-    </div>
+    {% else %}
+        <p>Sin proyectos asignados.</p>
+    {% endif %}
 {% endblock %}

@@ -4,7 +4,6 @@ from django.utils import timezone
 from core.models import Proyecto
 
 
-
 class LoginTest(TestCase):
     def setUp(self):
         User.objects.create_user('test', 'test@test.com', 'password')
@@ -111,6 +110,7 @@ class UserTest(TestCase):
         u = User.objects.get(pk=u.id)
         self.assertIsNotNone(u)
         self.assertFalse(u.is_active)
+
 
 class RolesTest(TestCase):
     def setUp(self):

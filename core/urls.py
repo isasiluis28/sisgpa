@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 from core.views import index_view, project_list, project_detail, project_create, project_update, project_delete
-from core.views.user_views import user_list, user_detail, user_create, user_delete, user_update
-from core.views.rol_views import rol_list, rol_create, rol_detail, rol_update
+from core.views import user_list, user_detail, user_create, user_delete, user_update
+from core.views import rol_list, rol_create, rol_detail, rol_update
 
 urlpatterns = [
     url(r'^$', index_view, name='index-view'),

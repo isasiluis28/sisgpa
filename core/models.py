@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
 from django.db import models
-from guardian.shortcuts import assign_perm, remove_perm
-
+from django.db.models.signals import m2m_changed
+from django.shortcuts import get_object_or_404
+from guardian.shortcuts import assign_perm, remove_perm, get_perms, get_perms_for_model
+from reversion import revisions as reversion
 
 class Proyecto(models.Model):
     ESTADOS = (
@@ -66,3 +68,131 @@ class MiembroEquipo(models.Model):
             for perm in rol.permissions.all():
                 remove_perm(perm.codename, self.usuario, self.proyecto)
         super(MiembroEquipo, self).delete(using, keep_parents)
+
+
+class Sprint(models.Model):
+    proyecto = models.ForeignKey(Proyecto)
+    nombre = models.CharField(max_length=30)
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+
+    def __unicode__(self):
+        return self.nombre
+
+    class Meta:
+        default_permissions = ()
+        verbose_name_plural = 'sprints'
+        verbose_name = 'sprint'
+
+
+class Flujo(models.Model):
+    """
+    Los flujos que forman parte de un proyecto
+    """
+    nombre = models.CharField(max_length=30)
+    proyecto = models.ForeignKey(Proyecto)
+
+    def __unicode__(self):
+        return self.nombre
+
+    class Meta:
+        default_permissions = ()
+        verbose_name = 'flujo'
+        verbose_name_plural = 'flujos'
+
+
+class Actividad(models.Model):
+    """
+    las actividades representan las distintas etapas de las que se compone un flujo
+    """
+
+    nombre = models.CharField(max_length=30)
+    flujo = models.ForeignKey(Flujo)
+
+    def __unicode__(self):
+        return self.nombre
+
+
+class UserStory(models.Model):
+    ACTIVIDAD_ESTADOS = (
+        (1, 'A Hacer'),
+        (2, 'Haciendo'),
+        (3, 'Hecho')
+    )
+    ESTADOS = (
+        (1, 'Inactivo'),
+        (2, 'En Curso'),
+        (3, 'Pendiente de Aprobacion'),
+        (4, 'Aprobado'),
+        (5, 'Cancelado')
+    )
+    PRIORIDADES = (
+        (1, 'Baja'),
+        (2, 'Media'),
+        (3, 'Alta')
+    )
+
+    nombre = models.CharField(max_length=60)
+    descripcion = models.TextField()
+    prioridad = models.IntegerField(default=1, choices=PRIORIDADES)
+    valor_negocio = models.IntegerField()
+    valor_tecnico = models.IntegerField()
+    tiempo_estimado = models.PositiveIntegerField()
+    tiempo_registrado = models.PositiveIntegerField(default=0)
+    ultimo_cambio = models.DateTimeField(auto_now=True)
+    estado = models.IntegerField(default=1, choices=ESTADOS)
+    estado_actividad = models.IntegerField(default=1, choices=ACTIVIDAD_ESTADOS)
+    proyecto = models.ForeignKey(Proyecto)
+    desarrolador = models.ForeignKey('auth.User', null=True, blank=True)
+    sprint = models.ForeignKey(Sprint, null=True, blank=True)
+    actividad = models.ForeignKey(Actividad, null=True, blank=True)
+
+    def __unicode__(self):
+        return self.nombre
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        old_dev = None
+
+        # si ya existe el objeto
+        if self.pk is not None:
+            old_instance = get_object_or_404(UserStory, pk=self.pk)
+            old_dev = old_instance.desarrolador
+        super(UserStory, self).save(force_insert, force_update, using, update_fields)
+
+        if old_dev and old_dev is not self.desarrolador:
+            for perm in get_perms(old_dev, self):
+                remove_perm(perm, old_dev, self)
+
+            if self.proyecto and self.desarrolador:
+                memebership = get_object_or_404(
+                    MiembroEquipo, usuario=self.desarrolador, proyecto=self.proyecto
+                )
+                permisos_us = get_perms_for_model(UserStory)
+                for rol in memebership.roles.all():
+                    for perm in rol.permissions.all():
+                        if perm in permisos_us:
+                            assign_perm(perm.codename, self.desarrolador, self)
+
+    class Meta:
+        default_permissions = ()
+        permissions = (
+            ('edit_my_us', 'editar mis user stories'),
+            ('register_my_us', 'registrar avances en mi user story')
+        )
+        verbose_name = 'user story'
+        verbose_name_plural = 'user stories'
+
+
+reversion.register(
+    UserStory,
+    fields=[
+        'nombre', 'descripcion', 'prioridad', 'valor_negocio', 'valor_tecnico', 'tiempo_estimado'
+    ]
+)
+
+from core.signals import add_permissions_team_member
+m2m_changed.connect(add_permissions_team_member, sender=MiembroEquipo.roles.through,
+                    dispatch_uid='add_permissions_signal')
+
+

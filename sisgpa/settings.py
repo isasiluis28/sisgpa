@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'guardian',
     'bootstrap3',
+    'reversion',
     'authentication',
     'core',
 ]

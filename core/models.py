@@ -31,6 +31,22 @@ class Proyecto(models.Model):
             ('list_all_projects', 'listar los proyectos disponibles'),
             ('view_project', 'ver el proyecto'),
             ('aprove_project', 'aprobar el proyecto'),
+
+            ('create_sprint', 'agregar sprint'),
+            ('edit_sprint', 'editar sprint'),
+            ('remove_sprint', 'eliminar sprint'),
+
+            ('create_flujo', 'agregar flujo'),
+            ('edit_flujo', 'editar flujo'),
+            ('remove_flujo', 'eliminar flujo'),
+
+            ('create_us', 'agregar user story'),
+            ('edit_us', 'editar user story'),
+            ('remove_us', 'eliminar user story'),
+            ('prior_us', 'asignar prioridad a user story'),
+            ('regactivity_us', 'registrar avances en user stories'),
+            ('aprove_us', 'aprobar user stories completados'),
+            ('cancel_us', 'cancelar user stories completados'),
         )
 
     def __unicode__(self):

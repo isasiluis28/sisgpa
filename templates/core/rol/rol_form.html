@@ -15,42 +15,56 @@
         {% csrf_token %}
         {{ form.non_field_errors }}
         <div class="form-group">
-            {{ form.name.errors }}
-            {{ form.name.label_tag }}
-            {{ form.name }}
+{#            {{ form.name.errors }}#}
+{#            {{ form.name.label_tag }}#}
+{#            {{ form.name }}#}
+            {% bootstrap_field form.name %}
 
         </div>
         <h3>Permisos</h3>
-        <div class="checkbox">
-                     <label for="checkboxall">
-                         <input id="checkboxall" type="checkbox">
-                         </input>
-                         Seleccionar todos
-                     </label>
-                 </div>
+            <div class="checkbox">
+                 <label for="checkboxall">
+                     <input id="checkboxall" type="checkbox">
+                     </input>
+                     Seleccionar todos
+                 </label>
+            </div>
             <div class="row">
-
                 <div class="form-group">
                     <div class="col-lg-6 permisos-checkboxes">
-                        {% bootstrap_field form.perms_proyecto %}
+                        {% bootstrap_field form.perms_us %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-lg-6 permisos-checkboxes">
+                        {% bootstrap_field form.perms_flujo %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-lg-6 permisos-checkboxes">
+                        {% bootstrap_field form.perms_sprint %}
                     </div>
                 </div>
             </div>
 
-        <div class="row">
-             <div class="form-group">
-                <div class="col-lg-4">
-                    <h5>{{ form.perms_user.label_tag }}</h5>
-                    {{ form.perms_user.errors }}
-                    {{ form.perms_user }}
-                </div>
-                <div class="col-lg-4">
-                    <h5>{{ form.perms_group.label_tag }}</h5>
-                    {{ form.perms_group.errors }}
-                    {{ form.perms_group }}
-                </div>
-             </div>
-        </div>
+{#        <div class="row">#}
+{#             <div class="form-group">#}
+{#                <div class="col-lg-4">#}
+{#                    <h5>{{ form.perms_user.label_tag }}</h5>#}
+{#                    {{ form.perms_user.errors }}#}
+{#                    {{ form.perms_user }}#}
+{#                </div>#}
+{#                <div class="col-lg-4">#}
+{#                    <h5>{{ form.perms_group.label_tag }}</h5>#}
+{#                    {{ form.perms_group.errors }}#}
+{#                    {{ form.perms_group }}#}
+{#                </div>#}
+{#             </div>#}
+{#        </div>#}
         <input type="submit" value="{{ accion }}" class="btn btn-default"/>
     </form>
 

@@ -1,4 +1,5 @@
 {% extends 'core/sprint/base.html' %}
+{% load static %}
 {% load guardian_tags %}
 
 {% block breadcrumb %}
@@ -32,7 +33,7 @@
     <div id="userstoriespanels">
         {% for u in userstory_list %}
             <div class="col-lg-3">
-                    <div class="panel panel-{% if u.prioridad == 0 %}green{% elif u.prioridad == 1 %}yellow{% else %}red{% endif %}">
+                <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="panel-title"> <a href="#" style="color:#ffffff;">{{ u.nombre }}</a></div>
                     </div>
@@ -45,13 +46,13 @@
                         {% endif %}
                         </br>
                         {% if u.actividad %}
-                            <strong>Flujo: </strong><a href="{% url 'project:flujo_detail' u.actividad.flujo_id %}">{{ u.actividad.flujo }}</a><br/>
+                            <strong>Flujo: </strong><a href="#">{{ u.actividad.flujo }}</a><br/>
                             <strong>Actividad: </strong>{{ u.actividad }} - {{ u.get_estado_actividad_display }}<br/>
                         {% endif %}
                         <strong>Prioriodad: </strong>{{ u.get_prioridad_display }}
                     </div>
                     <div class="panel-footer">
-                        <a href="{% url 'project:userstory_detail' u.id %}"><i class="fa fa-eye fa-fw"></i></a>
+                        <a href="#"><i class="fa fa-eye fa-fw"></i></a>
                         {% if "edit_us" in proyecto_perms %}<a href="#"><i
                                 class="fa fa-pencil fa-fw"></i></a>{% endif %}
                         {% if "remove_us" in proyecto_perms %}<a href="#"><i
@@ -70,7 +71,14 @@
 
 {% endblock %}
 
+
+{% block inside_extracss %}
+    <link href="{% static 'css/metisMenu.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+
 {% block inside_extrajs %}
+    <script src="{% static 'js/metisMenu.min.js' %}"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             $("#filtro").keyup(function () {

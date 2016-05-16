@@ -4,8 +4,8 @@
 {% block proyectos_activo %}class="active"{% endblock %}
 
 {% block breadcrumb %}
-    <li>Proyectos</li>
-    <li>nombre proyecto</li>
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{% url 'project_detail' view.project.id %}">{{ view.project.nombre_corto }}</a></li>
     <li class="active">Sprints</li>
 
 {% endblock %}

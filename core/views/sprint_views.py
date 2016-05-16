@@ -30,6 +30,8 @@ class SprintList(LoginRequiredMixin, GlobalPermissionMixin, ListView):
         return get_object_or_404(Proyecto, pk=self.kwargs['project_pk'])
 
     def get_permission_object(self):
+        if self.project is None:
+            self.project = self.get_objeto()
         return self.get_objeto()
 
     def get_context_data(self, **kwargs):
@@ -49,18 +51,16 @@ class SprintDetail(LoginRequiredMixin, GlobalPermissionMixin, DetailView):
     template_name = 'core/sprint/sprint_detail.html'
     context_object_name = 'sprint'
 
-    def get_objeto(self):
-        return get_object_or_404(Proyecto, pk=self.kwargs['project_pk'])
-
     def get_permission_object(self):
-        return self.get_objeto()
+        return self.get_object().proyecto
 
     def get_context_data(self, **kwargs):
         context = super(SprintDetail, self).get_context_data(**kwargs)
-        context['userstory_list'] = self.object.usertory_set.order_by('-prioridad')
+        context['userstory_list'] = self.object.userstory_set.order_by('-prioridad')
         return context
 
 sprint_detail = SprintDetail.as_view()
+
 
 class SprintCreate(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMixin, CreateView):
     model = Sprint
@@ -70,17 +70,19 @@ class SprintCreate(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMix
                                    widgets={'fecha_inicio': SelectDateWidget, 'proyecto': HiddenInput},
                                    fields={'nombre', 'fecha_inicio', 'proyecto'})
     formset = formset_factory(AddToSprintForm, formset=AddToSprintFormSet, extra=1)
-    proyecto = None
-    flujo = None
+    project = None
+    # flujo = None
 
     def get_proyecto(self):
         return get_object_or_404(Proyecto, pk=self.kwargs['project_pk'])
 
-    def get_initial(self):
-        initial = {'proyecto': self.get_proyecto()}
-        return initial
+    # def get_initial(self):
+    #     initial = {'project': self.get_proyecto()}
+    #     return initial
 
     def get_permission_object(self):
+        if self.project is None:
+            self.project = self.get_proyecto()
         return self.get_proyecto()
 
     def __filtar_formset(self, formset):
@@ -88,7 +90,7 @@ class SprintCreate(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMix
             userformset.fields['desarrollador'].queryset = User.objects.filter(miembroequipo__proyecto=self.get_proyecto())
             userformset.fields['flujo'].queryset = Flujo.objects.filter(proyecto=self.get_proyecto())
             userformset.fields['userstory'].queryset = UserStory.objects.filter(
-                Q(proyecto=self.proyecto), Q(estado=2) | Q(estado=1)
+                Q(proyecto=self.get_proyecto()), Q(estado=2) | Q(estado=1)
             )
 
     def get_context_data(self, **kwargs):
@@ -118,7 +120,7 @@ class SprintCreate(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMix
         """
         proyecto = self.get_proyecto()
         self.object = form.save(commit=False)
-        self.object.fecha_fin = self.object.fecha_inicio + datetime.timedelta(days=self.proyecto.duracion_sprint)
+        self.object.fecha_fin = self.object.fecha_inicio + datetime.timedelta(days=self.get_proyecto().duracion_sprint)
         proyecto.estado = 'EP'
         proyecto.save()
         self.object.save()
@@ -129,11 +131,11 @@ class SprintCreate(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMix
                 for subform in formset_b:
                     new_us = subform.cleaned_data['userstory']
                     new_flujo = subform.cleaned_data['flujo']
-                    self.flujo = new_flujo
-                    new_dev = subform.cleaned_data['desarrolador']
+                    # self.flujo = new_flujo
+                    new_dev = subform.cleaned_data['desarrollador']
                     new_us.desarrolador = new_dev
                     new_us.sprint = self.object
-                    new_us.actividad = self.flujo.actividad_set.first()
+                    new_us.actividad = new_flujo.actividad_set.first()
                     new_us.estado_actividad = 1
                     new_us.estado = 2  # el us pasa a estar en curso por incluirse en el sprint
                     new_us.save()

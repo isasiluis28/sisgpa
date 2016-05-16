@@ -4,15 +4,15 @@
 
 {% block breadcrumb %}
     <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
-    {% if current_action == 'editar' %}
-        <li><a href="{{ sprint.proyecto.get_absolute_url }}">{{ sprint.proyecto }}</a></li>
-        <li><a href="{% url 'sprint_list' sprint.proyecto_id %}">Sprints</a></li>
-        <li><a href="{{ sprint.get_absolute_url }}">{{ sprint }}</a></li>
-    {% elif current_action == 'agregar' %}
-        <li><a href="{{ view.proyecto.get_absolute_url }}">{{ view.proyecto }}</a></li>
-        <li><a href="#">Sprints</a></li>
-    {% endif %}
-    <li class="active">{{ current_action }}</li>
+{#    {% if current_action == 'editar' %}#}
+{#        <li><a href="{{ sprint.proyecto.get_absolute_url }}">{{ sprint.proyecto }}</a></li>#}
+{#        <li><a href="{% url 'sprint_list' sprint.proyecto_id %}">Sprints</a></li>#}
+{#        <li><a href="{{ sprint.get_absolute_url }}">{{ sprint }}</a></li>#}
+{#    {% elif current_action == 'agregar' %}#}
+        <li><a href="{{ view.project.get_absolute_url }}">{{ view.project.nombre_corto }}</a></li>
+        <li><a href="{% url 'sprint_list' view.project.id %}">Sprints</a></li>
+{#    {% endif %}#}
+    <li class="active">{{ current_action | title }}</li>
 {% endblock %}
 
 {% block inside_extrajs %}

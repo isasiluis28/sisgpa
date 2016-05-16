@@ -126,7 +126,7 @@ class SprintCreateBaseForm(forms.ModelForm):
         """
 
         # si existe algun error en el form no se hace validaciones
-        if any(self.erros):
+        if any(self.errors):
             return
 
         if 'fecha_inicio' and 'proyecto' in self.cleaned_data:
@@ -135,16 +135,17 @@ class SprintCreateBaseForm(forms.ModelForm):
 
             fin = fecha_inicio + datetime.timedelta(days=proyecto.duracion_sprint)
             hoy = timezone.now().date()
-            sprint = proyecto.sprint_set.filter(fecha_inicio__lte=fin, fecha_fin_gte=fecha_inicio).exclude(pk=self.instance.pk)
-            if (fecha_inicio.date() < hoy) and (fecha_inicio is not self.instance.fecha_inicio):
+
+            sprint_list = proyecto.sprint_set.filter(fecha_inicio__lte=fin, fecha_fin__gte=fecha_inicio).exclude(pk=self.instance.pk)
+            if (fecha_inicio < hoy) and (fecha_inicio is not self.instance.fecha_inicio):
                 raise ValidationError({'fecha_inicio': 'Fecha de inicio debe ser mayor o igual a la fecha actual'})
-            if sprint.exists():
-                raise ValidationError({'fecha_inicio': 'Durante este periodo ya existe el sprint ' + str(sprint[0].nombre)})
-            if fecha_inicio.date() < proyecto.fecha_inicio.date():
+            if sprint_list.exists():
+                raise ValidationError({'fecha_inicio': 'Durante este periodo ya existe el sprint ' + str(sprint_list[0].nombre)})
+            if fecha_inicio < proyecto.fecha_inicio:
                 raise ValidationError({'fecha_inicio': 'Fecha de inicio debe ser mayor a la fecha de inicio del proyecto.'})
-            if fecha_inicio.date() >= proyecto.fecha_fin.date():
+            if fecha_inicio >= proyecto.fecha_fin:
                 raise ValidationError({'fecha_inicio': 'Fecha de inicio debe ser menor a la fecha de fin del proyecto'})
-            if fin.date() > proyecto.fecha_fin.date():
+            if fin > proyecto.fecha_fin:
                 raise ValidationError({'fecha_inicio': 'Fin del sprint supera la fecha de fin del proyecto'})
 
 

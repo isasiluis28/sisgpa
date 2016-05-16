@@ -10,6 +10,15 @@
     {% get_obj_perms user for project as "project_perms" %}
     <h1>{{ project.nombre_largo }}</h1>
 
+    <ul class="list-inline">
+        <li><a href="{% url 'project_update' project.id %}" class="fa fa-pencil"> Editar</a></li>
+        <li><a href="{% url 'project_delete' project.id %}" class="fa fa-eraser"> Cancelar</a></li>
+        <a href="{% url 'us_list' project.id %}"><i class="fa fa-file fa-fw"></i> Ver Product Backlog</a>
+{#        <a href="/projects/12/userstories/pending/"><i class="fa fa-check-square fa-fw"></i> User Stories a Aprobar <span class="badge">0</span></a>#}
+
+
+    </ul>
+
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-body tabs">
@@ -70,7 +79,7 @@
             <div class="panel-body">
                 {% if sprints %}
                     {% for s in sprints %}
-                        <a href="#" class="list-group-item">{{ s.nombre }}
+                        <a href="{% url 'sprint_detail' s.id %}" class="list-group-item">{{ s.nombre }}
                             <span class="badge" data-toggle="tooltip" data-placement="right"
                                   >{{ s.userstory_set.count }}</span>
                         </a>

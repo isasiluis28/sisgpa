@@ -9,7 +9,7 @@
 
 {% block before_table %}
     <h4><strong>Proyecto: </strong><td>{{ view.project }}</td></h4>
-    {% if "create_flujo" in proyecto_perms %}<p><a href="#" class="fa fa-plus-circle"> Agregar</a></p>{% endif %}
+    {% if "create_flujo" in proyecto_perms %}<p><a href="{% url 'flujo_create' view.project.id %}" class="fa fa-plus-circle"> Agregar</a></p>{% endif %}
 {#    {% if "create_flujo" in proyecto_perms %}<p><a href="#" class="fa fa-clipboard"> Crear desde plantilla</a></p>{% endif %}#}
 {% endblock %}
 
@@ -28,9 +28,9 @@
     <tr class="odd gradeX">
         <td>{{ f.nombre }}</td>
         <td>{{ f.actividad_set.count }}</td>
-        <td ><a href="{% url 'flujo_detail' f.id %}"><i class="fa fa-eye fa-fw"></i></a> </td>
-        {% if "edit_flujo" in proyecto_perms %}<td><a href="#"><i class="fa fa-pencil fa-fw"></i></a></td>{% endif %}
-        {% if "remove_flujo" in proyecto_perms %}<td><a href="#"><i class="fa fa-trash-o fa-fw"></i></a></td>{% endif %}
+        <td ><a href="{% url 'flujo_detail' f.id %}"><span class="glyphicon glyphicon-eye-open"></span></a> </td>
+        {% if "edit_flujo" in proyecto_perms %}<td><a href="#"><span class="glyphicon glyphicon-edit"></span></a></td>{% endif %}
+        {% if "remove_flujo" in proyecto_perms %}<td><a href="#"><span class="glyphicon glyphicon-trash"></span></a></td>{% endif %}
     </tr>
     {% endfor %}
 {% endblock %}

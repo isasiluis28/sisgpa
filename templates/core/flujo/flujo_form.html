@@ -1,0 +1,81 @@
+{% extends "core/flujo/base.html" %}
+{% load static %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    {% if current_action == 'Editar' %}
+        <li><a href="{{ flujo.proyecto.get_absolute_url }}">{{ flujo.proyecto }}</a></li>
+        <li><a href="{% url 'flujo_list' flujo.proyecto_id %}">Flujos</a></li>
+        <li><a href="{{ flujo.get_absolute_url }}">{{ flujo }}</a></li>
+    {% elif current_action == 'Agregar' %}
+        <li><a href="{{ view.proyecto.get_absolute_url }}">{{ view.proyecto }}</a></li>
+        <li><a href="{% url 'flujo_list' view.proyecto.id %}">Flujos</a></li>
+    {% endif %}
+    <li class="active">{{ current_action }}</li>
+{% endblock %}
+
+{% block inside_extrajs %}
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript">
+    $(function() {
+        $('.activity').formset({
+            prefix: '{{ actividad_form.prefix }}',
+            addText: 'Agregar actividad',
+            deleteText: 'Eliminar'
+        });
+        $('.sortable').sortable({
+            cursor: 'move',
+            update: function(event, ui) {
+                //reiniciamos conteo de posiciones
+                var currentPos = 1;
+                var camposName = $("input[id$='-name']");
+                var camposOrder = $("input[id$='-ORDER']");
+                for(var i=0; i<camposOrder.length; i++) {
+                    var elem = camposOrder.eq(i);
+                    var elemName = camposName.eq(i);
+                    if(elemName.val()) {
+                        elem.val(currentPos);
+                        currentPos++;
+                    }
+                }
+            }
+        });
+    })
+    </script>
+{% endblock %}
+
+{% block inside_content %}
+    <style media="screen" type="text/css">
+        input[id$='-ORDER'] { display: none; }
+    </style>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div>
+            {{ form.as_p }}
+        </div>
+        <fieldset>
+            <legend> Actividades</legend>
+            <div class="sortable">
+            {{ actividad_form.management_form }}
+            {{ actividad_form.non_form_errors }}
+                {% for form in actividad_form %}
+
+                    {{ form.id }}
+                    <div  class="activity form-group">
+                    <span class="fa fa-arrows"> </span>
+                    {{ form.nombre.errors }}
+                   <label> {{ form.nombre.label_tag }}</label>
+                   {{ form.nombre }}
+                    {% if actividad_form.can_order %}
+                        {{ form.ORDER }}
+                        {{ form.DELETE }}
+                    {% endif %}
+                    </div>
+            {% endfor %}
+            </div>
+        </fieldset>
+        <input type="submit" value="{{ current_action }}" class="btn btn-default"/>
+    </form>
+
+{% endblock %}

@@ -97,7 +97,8 @@ class AddFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMixin, 
         if actividad_form.is_valid():
             actividad_form.save()
             order = [form.instance.id for form in actividad_form.ordered_forms]
-            self.object.set_actividad_order(order)
+            if hasattr(self.object, 'set_actividad_order'):
+                self.object.set_actividad_order(order)
             return HttpResponseRedirect(self.get_success_url())
 
         return render(

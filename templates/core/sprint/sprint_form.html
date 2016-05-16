@@ -1,0 +1,67 @@
+{% extends 'core/sprint/base.html' %}
+{% load static %}
+{% load bootstrap3 %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+{#    {% if current_action == 'editar' %}#}
+{#        <li><a href="{{ sprint.proyecto.get_absolute_url }}">{{ sprint.proyecto }}</a></li>#}
+{#        <li><a href="{% url 'sprint_list' sprint.proyecto_id %}">Sprints</a></li>#}
+{#        <li><a href="{{ sprint.get_absolute_url }}">{{ sprint }}</a></li>#}
+{#    {% elif current_action == 'agregar' %}#}
+        <li><a href="{{ view.project.get_absolute_url }}">{{ view.project.nombre_corto }}</a></li>
+        <li><a href="{% url 'sprint_list' view.project.id %}">Sprints</a></li>
+{#    {% endif %}#}
+    <li class="active">{{ current_action | title }}</li>
+{% endblock %}
+
+{% block inside_extrajs %}
+    <script src="{% static 'js/jquery.formset.js' %}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('.teammember').formset({
+                prefix: '{{ formset.prefix }}',
+                addText: 'Agregar UserStory',
+                deleteText: 'Eliminar'
+            });
+        })
+    </script>
+{% endblock %}
+
+{% block inside_content %}
+    <style>
+        .empty-form {
+            display: none;
+        }
+    </style>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-lg-3">
+                {% bootstrap_field form.nombre %}
+            </div>
+            <div class="col-lg-3">
+                {% bootstrap_field form.fecha_inicio %}
+            </div>
+            {%  bootstrap_field form.proyecto %}
+        </div>
+        <fieldset>
+            <legend>Agregar UserStory</legend>
+            {{ formset.management_form }}
+            {{ formset.non_form_errors }}
+            <div class="row top-buffer team-members">
+                {% for form in formset %}
+                    {{ form.id }}
+                    <div class="teammember" id="teammember-{{ forloop.counter0 }}">
+                        {% if form.instance.pk %}{% bootstrap_field form.DELETE %}{% endif %}
+                        {% bootstrap_form form %}
+
+                    </div>
+
+                {% endfor %}
+            </div>
+        </fieldset>
+        <input type="submit" value="Agregar" class="btn btn-default"/>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'core/us/base.html' %}
+{% load static %}
+{% load guardian_tags %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{% url 'project_detail' view.project.id %}">{{ view.project }}</a></li>
+    <li class="active">User Stories</li>
+{% endblock %}
+
+{% block inside_content %}
+    <h4><strong>Proyecto: </strong><td>{{ view.project }}</td></h4>
+
+    {% if "create_us" in proyecto_perms %}<p><a href="#" class="fa fa-plus-circle"> Agregar</a></p>{% endif %}
+
+    <h3>User Stories</h3>
+    <!-- Buscador -->
+    <form id="buscador" action="" class="styled" method="post">
+        <div class="form-group">
+            <input type="text" placeholder="Buscar User Story" id="filtro" value="" />
+        </div>
+    </form>
+
+    <div id="userstoriespanels">
+    {% for us in userstories %}
+        {% get_obj_perms user for us as "us_perms" %}
+    <tr class="odd gradeX">
+       <div class="col-lg-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title"> <a href="{% url 'us_detail' us.id %}" style="color:#ffffff;">{{ us.nombre }}</a></div>
+                </div>
+                <div class="panel-body">
+                    <strong>Estado actual: </strong>{{ us.get_estado_display }}<br/>
+                    <strong>Desarrollador: </strong>
+                    {% if us.desarrollador %}
+                        <a href="#">{{ us.desarrollador }}</a>
+                    {% else %}
+                        Ninguno
+                    {% endif %}
+                    </br>
+                    {% if us.actividad %}
+                        <strong>Flujo: </strong><a href="#">{{ us.actividad.flujo }}</a><br/>
+                        <strong>Actividad: </strong>{{ us.actividad }} - {{ us.get_estado_actividad_display }}<br/>
+                    {% endif %}
+                        <strong>Prioriodad: </strong>{{ us.get_prioridad_display }}
+                </div>
+                <div class="panel-footer">
+                    <a href="#"><i class="fa fa-eye fa-fw"></i></a>
+                    {% if "edit_us" in proyecto_perms %}<a href="#"><i
+                            class="fa fa-pencil fa-fw"></i></a>{% endif %}
+                    {% if "remove_us" in proyecto_perms %}<a href="#"><i
+                            class="fa fa-trash-o fa-fw"></i></a>{% endif %}
+                    {% if us.estado != 5  and us.estado != 4%}
+                        {% if "cancel_us" in proyecto_perms %}<a href="#"><i class="fa fa-times"></i></a> {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="col-lg-12">
+    <p><a class="fa fa-file" href="{% url 'project_detail' view.project.id %}"> Volver al Proyecto {{ view.project.nombre_corto }}</a></p>
+    </div>
+{% endblock %}
+
+{% block inside_extrajs %}
+        <script type="text/javascript">
+        $(document).ready(function () {
+            $("#filtro").keyup(function () {
+                var filtro = $(this).val();
+                $("#userstoriespanels").children("div").each(function () {
+                    if ($(this).text().search(new RegExp(filtro, "i")) < 0) {
+                        $(this).fadeOut();
+                    } else {
+                        $(this).fadeIn();
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

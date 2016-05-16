@@ -1,0 +1,36 @@
+{% extends 'core/base_table.html' %}
+{% block titulo_pestana %}Sprints{% endblock %}
+
+{% block proyectos_activo %}class="active"{% endblock %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{% url 'project_detail' view.project.id %}">{{ view.project.nombre_corto }}</a></li>
+    <li class="active">Sprints</li>
+
+{% endblock %}
+
+{% block before_table %}
+    {% if perms.auth.add_group %}
+        <p><a href="{% url 'sprint_create' view.kwargs.project_pk %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></p>
+    {% endif %}
+{% endblock %}
+
+{% block thead %}
+        <tr>
+            <th>Nombre</th>
+            <th>User Stories</th>
+            <th>Ver</th>
+            {% if 'edit_sprint' in proyecto_perms %}<th>Editar</th>{% endif %}
+        </tr>
+{% endblock %}
+{% block tbody %}
+        {% for s in sprints %}
+        <tr class="odd gradeX">
+            <td>{{ s.nombre }}</td>
+            <td>{{ s.userstory_set.count }}</td>
+            <td ><a href="#"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a></td>
+            {% if 'edit_sprint' in proyecto_perms %}<td><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>{% endif %}
+        </tr>
+        {% endfor %}
+{% endblock %}

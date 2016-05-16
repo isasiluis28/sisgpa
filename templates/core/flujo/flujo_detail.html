@@ -1,0 +1,107 @@
+{% extends 'core/base_table.html' %}
+{% load guardian_tags %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{{ flujo.proyecto.get_absolute_url }}">{{ flujo.proyecto }}</a></li>
+    <li><a href="{% url 'flujo_list' flujo.proyecto_id %}">Flujos</a></li>
+    <li class="active">{{ flujo }}</li>
+{% endblock %}
+
+{% block before_table %}
+    <ul class="list-inline">
+        {% get_obj_perms user for flujo.proyecto as "proyecto_perms" %}
+        {% if "edit_flujo" in proyecto_perms %}
+            <li><a href="#" class="fa fa-pencil"> Edit</a></li>{% endif %}
+        {% if "remove_flujo" in proyecto_perms %}
+            <li><a href="#" class="fa fa-eraser"> Delete</a></li>{% endif %}
+    </ul>
+
+    <p><strong>Proyecto Asociado:</strong> {{ flujo.proyecto }}</p>
+    <ul class="nav nav-pills">
+        <li {% if not sprint %}class="active"{% endif %}><a href="#">Ver Todos</a></li>
+        {% for s in flujo.proyecto.sprint_set.all %}
+            <li {% if s.id == sprint.id %}class="active"{% endif %}><a href="#">{{ s }}</a></li>
+        {% endfor %}
+    </ul>
+    <p><strong>Proyecto Asociado:</strong> {{ flujo.proyecto }}</p>
+{#    <p><strong>Tiempo Registrado:</strong> {{ registrado|default_if_none:"0" }} horas</p>#}
+{#    <p><strong>Tiempo Estimado:</strong> {{ estimado|default_if_none:"0" }} horas</p>#}
+
+{% endblock %}
+
+{% block thead %}
+    {% for a in actividades %}
+        <th class="text-center">{{ a.0 }} <span class="badge">{{ a.1 }} US</span> </th>
+    {% endfor %}
+{% endblock %}
+
+{% block tbody %}
+    {% for us in act_us %}
+        <td>
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <th class="text-center">To Do</th>
+                    <th class="text-center">Doing</th>
+                    <th class="text-center">Done</th>
+                </thead>
+                {% for u in us %}
+                     <tbody>
+                     <tr>
+                         <td class="text-center">
+                         {% if  u.estado_actividad == 1 %}
+                             {% with p=u.prioridad %}
+                                 <a href="{% url 'us_detail' u.id %}" class="btn btn-outline
+                                 btn-{% if p == 1 %}primary{% elif p == 2 %}warning{% elif p == 3 %}danger{% endif %}
+                                 btn-sm btn-block">{% if u.estado == 4 %}<li class="fa fa-check-circle fa-adjust"></li>{% elif u.estado == 4 %}<li class="fa fa-times-circle fa-adjust"></li> {% endif %}{{ u.nombre }} ({{ u.tiempo_registrado }}/{{ u.tiempo_estimado }})</a>
+                             {% endwith %}
+                         {% endif %}
+                         </td>
+                         <td class="text-center">
+                         {% if u.estado_actividad == 2 %}
+                             {% with p=u.prioridad %}
+                                 <a href="{% url 'us_detail' u.id %}" class="btn btn-outline
+                                 btn-{% if p == 1 %}primary{% elif p == 2 %}warning{% elif p == 3 %}danger{% endif %}
+                                 btn-sm btn-block">{% if u.estado == 4 %}<li class="fa fa-check-circle fa-adjust"></li>{% elif u.estado == 4 %}<li class="fa fa-times-circle fa-adjust"></li> {% endif %}{{ u.nombre }} ({{ u.tiempo_registrado }}/{{ u.tiempo_estimado }})</a>
+                             {% endwith %}
+                         {% endif %}
+                         </td>
+                         <td class="text-center">
+                         {% if u.estado_actividad == 3 %}
+                             {% with p=u.prioridad %}
+                                 <a href="{% url 'us_detail' u.id %}" class="btn btn-outline
+                                 btn-{% if p == 1 %}primary{% elif p == 2 %}warning{% elif p == 3 %}danger{% endif %}
+                                 btn-sm btn-block">{% if u.estado == 4 %}<li class="fa fa-check-circle fa-adjust"></li>{% elif u.estado == 4 %}<li class="fa fa-times-circle fa-adjust"></li> {% endif %}{{ u.nombre }} ({{ u.tiempo_registrado }}/{{ u.tiempo_estimado }})</a>
+                             {% endwith %}
+                         {% endif %}
+                         </td>
+                     </tr>
+                     </tbody>
+                {% endfor %}
+            </table>
+        </td>
+    {% endfor %}
+{% endblock %}
+{#{% block after_table %}#}
+{#    <div class="col-lg-4">#}
+{#        <div class="panel panel-primary">#}
+{#            <div class="panel-heading">#}
+{#                Observacion#}
+{#            </div>#}
+{#            <div class="panel-body">#}
+{#                <p style="color: #d33333" >User story de prioridad alta</p>#}
+{#                <p style="color: orange">User story de prioridad medio</p>#}
+{#                <p style="color: #0044DD"> User story de prioridad baja</p>#}
+{#                <p class="fa fa-check-circle">: User Story aprobado</p>#}
+{#                <p class="fa fa-times-circle">: User Story cancelado </p>#}
+{#            </div>#}
+{#            <div class="panel-footer">#}
+{#                Los colores representan la prioridad#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="col-lg-12">#}
+{#            <p><a class="fa fa-step-backward" href="{% url 'flujo_list' flujo.proyecto.id %}"> Volver a#}
+{#                Flujos</a></p>#}
+{#    </div>#}
+{#{% endblock %}#}

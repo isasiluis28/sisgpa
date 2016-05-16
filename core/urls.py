@@ -2,6 +2,7 @@ from django.conf.urls import url, include
 from core.views import index_view, project_list, project_detail, project_create, project_update, project_delete
 from core.views import user_list, user_detail, user_create, user_delete, user_update
 from core.views import rol_list, rol_create, rol_detail, rol_update
+from core.views.sprint_views import sprint_list, sprint_create, sprint_detail
 
 urlpatterns = [
     url(r'^$', index_view, name='index-view'),
@@ -21,5 +22,9 @@ urlpatterns = [
     url(r'^roles/add/$', rol_create, name='rol_create'),
     url(r'^roles/(?P<pk>\d+)/$', rol_detail, name='rol_detail'),
     url(r'^roles/(?P<pk>\d+)/edit/$', rol_update, name="rol_update"),
+
+    url(r'^projects/(?P<project_pk>\d+)/sprint/$', sprint_list, name="sprint_list"),
+    url(r'^projects/(?P<project_pk>\d+)/sprint/add/$', sprint_create, name="sprint_create"),
+    url(r'^sprint/(?P<pk>\d+)/$', sprint_detail, name='sprint_detail'),
 
 ]

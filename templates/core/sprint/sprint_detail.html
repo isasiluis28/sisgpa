@@ -1,0 +1,89 @@
+{% extends 'core/sprint/base.html' %}
+{% load guardian_tags %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{{ sprint.proyecto.get_absolute_url }}">{{ sprint.proyecto }}</a></li>
+    <li><a href="{% url 'sprint_list' sprint.proyecto_id %}">Sprints</a></li>
+    <li class="active">{{ sprint }}</li>
+{% endblock %}
+
+{% block inside_content %}
+    <ul class="list-inline">
+        {% get_obj_perms user for sprint.proyecto as "proyecto_perms" %}
+        {% if "edit_sprint" in proyecto_perms %}
+            <li><a href="#" class="fa fa-pencil"> Edit</a></li>
+        {% endif %}
+{#        <li><a href="{% url 'project:sprint_burndown'  sprint.id %}" class="fa fa-line-chart"> Ver Burndown</a></li>#}
+{#    <li><a href="{% url 'project:reporte_backlog_sprint' sprint.id %}" class="fa fa-file-pdf-o"> Ver Reporte de Backlog de Sprint</a> </li>#}
+    </ul>
+    <p><strong>Nombre:</strong> {{ sprint.nombre }}</p>
+    <p><strong>Fecha Inicio:</strong>{{ sprint.fecha_inicio }}</p>
+    <p><strong>Fecha fin:</strong>{{ sprint.fecha_fin }}</p>
+    <p><strong>Proyecto Asociado:</strong> {{ sprint.proyecto }}</p>
+
+    <h3>User Stories</h3>
+    <!-- Buscador -->
+    <form id="buscador" action="" class="styled" method="post">
+        <div class="form-group">
+            <input type="text" placeholder="Buscar User Story" id="filtro" value="" />
+        </div>
+    </form>
+    <div id="userstoriespanels">
+        {% for u in userstory_list %}
+            <div class="col-lg-3">
+                    <div class="panel panel-{% if u.prioridad == 0 %}green{% elif u.prioridad == 1 %}yellow{% else %}red{% endif %}">
+                    <div class="panel-heading">
+                        <div class="panel-title"> <a href="#" style="color:#ffffff;">{{ u.nombre }}</a></div>
+                    </div>
+                    <div class="panel-body">
+                        <strong>Desarrollador: </strong>
+                        {% if u.desarrollador %}
+                            <a href="{% url 'user_detail' u.desarrollador_id %}">{{ u.desarrollador }}</a>
+                        {% else %}
+                            Ninguno
+                        {% endif %}
+                        </br>
+                        {% if u.actividad %}
+                            <strong>Flujo: </strong><a href="{% url 'project:flujo_detail' u.actividad.flujo_id %}">{{ u.actividad.flujo }}</a><br/>
+                            <strong>Actividad: </strong>{{ u.actividad }} - {{ u.get_estado_actividad_display }}<br/>
+                        {% endif %}
+                        <strong>Prioriodad: </strong>{{ u.get_prioridad_display }}
+                    </div>
+                    <div class="panel-footer">
+                        <a href="{% url 'project:userstory_detail' u.id %}"><i class="fa fa-eye fa-fw"></i></a>
+                        {% if "edit_us" in proyecto_perms %}<a href="#"><i
+                                class="fa fa-pencil fa-fw"></i></a>{% endif %}
+                        {% if "remove_us" in proyecto_perms %}<a href="#"><i
+                                class="fa fa-trash-o fa-fw"></i></a>{% endif %}
+                        {% if u.estado != 4  and u.estado != 3%}
+                        {% if "cancel_us" in proyecto_perms %}<a href="#"><i class="fa fa-times"></i></a> {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="col-lg-12">
+    <p><a class="fa fa-file" href="{% url 'project_detail' sprint.proyecto.id %}"> Volver al Proyecto {{ sprint.proyecto.nombre_corto }}</a></p>
+    </div>
+
+{% endblock %}
+
+{% block inside_extrajs %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#filtro").keyup(function () {
+                var filtro = $(this).val();
+                $("#userstoriespanels").children("div").each(function () {
+                    if ($(this).text().search(new RegExp(filtro, "i")) < 0) {
+                        $(this).fadeOut();
+                    } else {
+                        $(this).fadeIn();
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endblock %}

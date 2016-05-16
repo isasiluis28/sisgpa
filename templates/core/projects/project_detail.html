@@ -60,4 +60,27 @@
         </div>
     </div>
 
+    <div class="col-md-6">
+        <div class="panel panel-info">
+            <a href="{% url 'sprint_list' project.id %}">
+                <div class="panel-heading">
+                    Sprints
+                </div>
+            </a>
+            <div class="panel-body">
+                {% if sprints %}
+                    {% for s in sprints %}
+                        <a href="#" class="list-group-item">{{ s.nombre }}
+                            <span class="badge" data-toggle="tooltip" data-placement="right"
+                                  >{{ s.userstory_set.count }}</span>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <p>Sin sprints asignados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
 {% endblock %}

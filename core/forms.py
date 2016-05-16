@@ -69,6 +69,7 @@ class UserEditForm(UserChangeForm):
 
 class RolForm(forms.ModelForm):
     perms_proyecto_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'project' in perm.codename]
+    perms_proyecto_list.extend([(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'proyecto' in perm.codename])
     perms_us_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'us' in perm.codename]
     perms_flujo_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'flujo' in perm.codename]
     perms_sprint_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'sprint' in perm.codename]
@@ -149,11 +150,11 @@ class SprintCreateBaseForm(forms.ModelForm):
 
 class AddToSprintForm(forms.Form):
     userstory = forms.ModelChoiceField(queryset=UserStory.objects.all())
-    desarrolador = forms.ModelChoiceField(queryset=User.objects.all())
+    desarrollador = forms.ModelChoiceField(queryset=User.objects.all())
     flujo = forms.ModelChoiceField(queryset=Flujo.objects.all())
 
 
-class SprintFormSet(BaseFormSet):
+class AddToSprintFormSet(BaseFormSet):
     def clean(self):
         # si algun form del formset tiene errores, no se valida, se retorna directo
         if any(self.errors):

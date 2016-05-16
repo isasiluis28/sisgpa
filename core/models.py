@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse_lazy
 from django.db import models
 from django.db.models.signals import m2m_changed
 from django.shortcuts import get_object_or_404
@@ -54,6 +55,9 @@ class Proyecto(models.Model):
     def __unicode__(self):
         return self.nombre_corto
 
+    def get_absolute_url(self):
+        return reverse_lazy('project_detail', args=[self.pk])
+
     def clean(self):
         try:
             if self.fecha_inicio > self.fecha_fin:
@@ -96,6 +100,9 @@ class Sprint(models.Model):
 
     def __unicode__(self):
         return self.nombre
+
+    def get_absolute_url(self):
+        return reverse_lazy('sprint_detail', args=[self.pk])
 
     class Meta:
         default_permissions = ()

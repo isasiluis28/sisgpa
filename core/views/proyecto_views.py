@@ -40,6 +40,7 @@ class ProjectDetail(LoginRequiredMixin, GlobalPermissionMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProjectDetail, self).get_context_data(**kwargs)
         context['equipo'] = self.object.miembroequipo_set.all()
+        context['sprints'] = self.object.sprint_set.all()
         return context
 
 project_detail = ProjectDetail.as_view()

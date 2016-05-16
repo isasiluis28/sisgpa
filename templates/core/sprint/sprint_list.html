@@ -30,7 +30,7 @@
             <td>{{ s.nombre }}</td>
             <td>{{ s.userstory_set.count }}</td>
             <td ><a href="#"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a></td>
-            {% if 'edit_sprint' in proyecto_perms %}<td><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>{% endif %}
+            {% if 'edit_sprint' in proyecto_perms %}<td><a href="{% url 'sprint_update' s.id %}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a></td>{% endif %}
         </tr>
         {% endfor %}
 {% endblock %}

@@ -91,5 +91,27 @@
         </div>
     </div>
 
+    <div class="col-md-6">
+        <div class="panel panel-info">
+            <a href="{% url 'flujo_list' project.id %}">
+                <div class="panel-heading">
+                    Flujos
+                </div>
+            </a>
+            <div class="panel-body">
+                {% if flujos %}
+                    {% for f in flujos %}
+                        <a href="{% url 'flujo_detail' f.id %}" class="list-group-item">{{ f.nombre }}
+                            <span class="badge" data-toggle="tooltip" data-placement="right"
+                                  >{{ f.actividad_set.count }}</span>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <p>Sin flujos asignados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}

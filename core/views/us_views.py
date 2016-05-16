@@ -50,6 +50,8 @@ class USDetail(LoginRequiredMixin, GlobalPermissionMixin, DetailView):
     def get_permission_object(self):
         return self.get_object().proyecto
 
+us_detail = USDetail.as_view()
+
 
 class AddUserStory(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMixin, CreateView):
     model = UserStory

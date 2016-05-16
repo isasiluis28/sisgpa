@@ -14,20 +14,20 @@
     <ul class="list-inline" xmlns="http://www.w3.org/1999/html">
         {% get_obj_perms user for userstory.proyecto as "proyecto_perms" %}
         {% get_obj_perms user for userstory as "us_perms" %}
-        {% if "edit_us" in proyecto_perms or 'edit_my_userstory' in us_perms%}<li><a href="{% url 'project:userstory_update'  userstory.id %}" class="fa fa-pencil"> Editar</a></li>{% endif %}
-        {% if userstory.estado == 1 %}{# Si el User Story está en curso #}
-            {% if "registraractividad_userstory" in proyecto_perms or 'registraractividad_my_userstory' in us_perms %}<li><a href="{% url 'project:userstory_registraractividad'  userstory.id %}" class="fa fa-pencil-square-o"> Registrar Avance</a></li>{% endif %}
-            {% if "edit_userstory" in proyecto_perms or 'edit_my_userstory' in us_perms%}<li><a href="{% url 'project:version_list' userstory.id %}" class="fa fa-clock-o"> Historial</a></li>{% endif %}
-        {% elif userstory.estado == 2 %}
-            {% if "aprobar_userstory" in proyecto_perms %}<li><a href="{% url 'project:userstory_aprobar' userstory.id %}" class="fa fa-check-circle"> Aprobar User Story</a></li>{% endif %}
-            {% if "aprobar_userstory" in proyecto_perms %}<li><a href="{% url 'project:userstory_rechazar' userstory.id %}" class="fa fa-times-circle"> Rechazar User Story</a></li>{% endif %}
+        {% if "edit_us" in proyecto_perms or 'edit_my_us' in us_perms%}<li><a href="#" class="fa fa-pencil"> Editar</a></li>{% endif %}
+        {% if userstory.estado == 2 %}{# Si el User Story está en curso #}
+            {% if "regactivity_us" in proyecto_perms or 'register_my_us' in us_perms %}<li><a href="#" class="fa fa-pencil-square-o"> Registrar Avance</a></li>{% endif %}
+            {% if "edit_us" in proyecto_perms or 'edit_my_us' in us_perms%}<li><a href="#" class="fa fa-clock-o"> Historial</a></li>{% endif %}
+        {% elif userstory.estado == 3 %}
+            {% if "aprove_us" in proyecto_perms %}<li><a href="#" class="fa fa-check-circle"> Aprobar User Story</a></li>{% endif %}
+            {% if "aprove_us" in proyecto_perms %}<li><a href="#" class="fa fa-times-circle"> Rechazar User Story</a></li>{% endif %}
         {% endif %}
-        {% if "remove_userstory" in proyecto_perms %}<li><a href="{% url 'project:userstory_delete'  userstory.id %}" class="fa fa-eraser"> Borrar</a></li>{% endif %}
+        {% if "remove_us" in proyecto_perms %}<li><a href="#" class="fa fa-eraser"> Borrar</a></li>{% endif %}
 
-        <li><a href="{% url 'project:nota_list' userstory.id %}"><i class="fa fa-newspaper-o"></i> Avances</a></li>
-        <li><a href="{% url 'project:file_list' userstory.id %}"><i class="fa fa-file"></i> Adjuntos</a></li>
-        {%  if userstory.estado != 4 and userstory.estado != 3 %}
-        {% if "cancelar_userstory" in proyecto_perms %}<li><a href="{% url 'project:userstory_cancelar' userstory.id %}" class="fa fa-times"> Cancelar</a></li> {% endif %}
+        <li><a href="#"><i class="fa fa-newspaper-o"></i> Avances</a></li>
+        <li><a href="#"><i class="fa fa-file"></i> Adjuntos</a></li>
+        {%  if userstory.estado != 5 and userstory.estado != 4 %}
+        {% if "cancel_us" in proyecto_perms %}<li><a href="#" class="fa fa-times"> Cancelar</a></li> {% endif %}
         {% endif %}
     </ul>
     <p><strong>Proyecto Asociado:</strong> {{ userstory.proyecto }}</p>
@@ -40,9 +40,9 @@
                 <p><strong>Valor de negocio: </strong>{{ userstory.valor_negocio }}</p>
                 <p><strong>Valor Técnico: </strong>{{ userstory.valor_tecnico }}</p>
                 <p><strong>Último cambio: </strong>{{ userstory.ultimo_cambio }}</p>
-                {% if userstory.desarrollador %}<p><strong>Asignado a: </strong><a href="{% url 'project:user_detail' userstory.desarrollador.id %}">{{ userstory.desarrollador }}</a>{% endif %}
-                {% if userstory.actividad %}<p><strong>Flujo: </strong><a href="{% url 'project:flujo_detail' userstory.actividad.flujo.id %}"> {{ userstory.actividad.flujo }} </a>| <strong>Actividad: </strong>{{ userstory.actividad }} | <strong>Estado: </strong>{{ userstory.get_estado_actividad_display }} {% endif %}
-                {% if userstory.sprint %}<p><strong>Último Sprint: </strong><a href="{% url 'project:sprint_detail' userstory.sprint.id %}">{{ userstory.sprint }} </a>{% endif %}
+                {% if userstory.desarrollador %}<p><strong>Asignado a: </strong><a href="#">{{ userstory.desarrollador }}</a>{% endif %}
+                {% if userstory.actividad %}<p><strong>Flujo: </strong><a href="#"> {{ userstory.actividad.flujo }} </a>| <strong>Actividad: </strong>{{ userstory.actividad }} | <strong>Estado: </strong>{{ userstory.get_estado_actividad_display }} {% endif %}
+                {% if userstory.sprint %}<p><strong>Último Sprint: </strong><a href="#">{{ userstory.sprint }} </a>{% endif %}
             </div>
         </div>
         <div class="col-lg-6">
@@ -65,6 +65,6 @@
             </div>
         </div>
     </div>
-    <p><a class="fa fa-step-backward" href="{% url 'project:product_backlog' userstory.proyecto.id %}"> Volver a User Stories</a></p>
-    <p><a class="fa fa-file" href="{% url 'project:project_detail' userstory.proyecto.id %}"> Volver al Proyecto {{ userstory.proyecto.nombre_corto }}</a></p>
+    <p><a class="fa fa-step-backward" href="{% url 'us_list' userstory.proyecto.id %}"> Volver a User Stories</a></p>
+    <p><a class="fa fa-file" href="{% url 'project_detail' userstory.proyecto.id %}"> Volver al Proyecto {{ userstory.proyecto.nombre_corto }}</a></p>
 {% endblock %}

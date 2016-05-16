@@ -5,11 +5,11 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import Permission, User, Group
 from django.core.exceptions import ValidationError
 from django.forms.formsets import BaseFormSet
-from django.forms.models import BaseInlineFormSet
+from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.utils import timezone
 from guardian.shortcuts import get_perms_for_model
 
-from core.models import Proyecto, Sprint, Flujo, UserStory
+from core.models import Proyecto, Sprint, Flujo, UserStory, Actividad
 
 
 def __general_perms_list__():
@@ -112,7 +112,7 @@ class FlujoCreateForm(forms.ModelForm):
         model = Flujo
         fields = ('nombre',)
 
-# TODO ActividadFormSet poner en views
+ActividadFormSet = inlineformset_factory(Flujo, Actividad, can_order=True, can_delete=True, max_num=None, extra=1, fields='__all__',)
 
 
 class SprintCreateBaseForm(forms.ModelForm):

@@ -277,7 +277,7 @@ class SprintTest(TestCase):
         f = Flujo.objects.create(nombre ='flujo_test', proyecto= pro)
         Actividad.objects.create(nombre ='actividad_test', flujo=f)
         Sprint.objects.create(nombre='sprint_test',fecha_inicio=timezone.now(),fecha_fin=timezone.now(), proyecto=pro)
-
+    # test crear sprint
     def test_to_create_sprint(self):
         c = self.client
         self.assertTrue(c.login(username='temp', password='temp12345'))

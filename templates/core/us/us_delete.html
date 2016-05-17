@@ -1,0 +1,20 @@
+{% extends 'core/us/base.html' %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{% url 'project_detail' userstory.proyecto_id %}">{{ userstory.proyecto }}</a></li>
+    <li><a href="{% url 'us_list' userstory.proyecto_id %}">User Stories</a></li>
+    <li><a href="{% url 'us_detail' userstory.id %}">{{ userstory }}</a></li>
+    <li class="active">Eliminar</li>
+{% endblock %}
+
+{% block inside_content %}
+    <form action="" method="post" role="form">
+        {% csrf_token %}
+        <div class="form-group">
+            <p>Seguro de que desea eliminar el User Story <strong>{{ object }}</strong>?</p>
+        </div>
+
+        <input type="submit" value="Confirmar" class="btn btn-default"/>
+    </form>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'core/flujo/base.html' %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{{ flujo.proyecto.get_absolute_url }}">{{ flujo.proyecto }}</a></li>
+    <li><a href="{% url 'flujo_list' flujo.proyecto_id %}">Flujos</a></li>
+    <li><a href="{{ flujo.get_absolute_url }}">{{ flujo }}</a></li>
+    <li class="active">Eliminar</li>
+{% endblock %}
+
+{% block inside_content %}
+    <h1>Eliminar Flujo</h1>
+    <form action="" method="post" role="form">
+        {% csrf_token %}
+        <div class="form-group">
+            <p>Seguro de que desea eliminar el Flujo <strong>{{ object }}</strong>?</p>
+        </div>
+
+        <input type="submit" value="Confirmar" class="btn btn-default"/>
+    </form>
+{% endblock %}

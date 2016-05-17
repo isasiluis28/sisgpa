@@ -1,11 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models.aggregates import Sum
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.context import RequestContext
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 from guardian.shortcuts import get_perms
 
@@ -36,6 +36,7 @@ class FlujoList(LoginRequiredMixin, GlobalPermissionMixin, ListView):
             self.project = get_object_or_404(Proyecto, pk=self.kwargs['project_pk'])
         return Flujo.objects.filter(proyecto=self.project)
 
+
 flujo_list = FlujoList.as_view()
 
 
@@ -57,6 +58,7 @@ class FlujoDetail(LoginRequiredMixin, GlobalPermissionMixin, DetailView):
                             estimado=Sum('tiempo_estimado'))  # Aggregate retorna None en vez de 0
         context.update(time)
         return context
+
 
 flujo_detail = FlujoDetail.as_view()
 
@@ -109,3 +111,83 @@ class AddFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMixin, 
 
 
 add_flujo = AddFlujo.as_view()
+
+
+class UpdateFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissionMixin, UpdateView):
+    """
+    View que agrega un flujo al sistema
+    """
+    model = Flujo
+    template_name = 'core/flujo/flujo_form.html'
+    form_class = FlujoCreateForm
+    permission_required = 'project.edit_flujo'
+
+    def get_proyecto(self):
+        return self.get_object().proyecto
+
+    def get_permission_object(self):
+        return self.get_object().proyecto
+
+    def get_context_data(self, **kwargs):
+        """
+        Agregar datos al contexto
+        :param kwargs: argumentos clave
+        :return: contexto
+        """
+        context = super(UpdateFlujo, self).get_context_data(**kwargs)
+        context['current_action'] = "Editar"
+        context['actividad_form'] = ActividadFormSet(self.request.POST if self.request.method == 'POST' else None,
+                                                     instance=self.object)
+
+        return context
+
+    def get_success_url(self):
+        """
+        :return:la url de redireccion a la vista de los detalles del flujo agregado.
+        """
+        return reverse('flujo_detail', kwargs={'pk': self.object.id})
+
+    def form_valid(self, form):
+        """
+        Comprobar validez del formulario. Crea una instancia de flujo para asociar con la actividad
+        :param form: formulario recibido
+        :param actividad_form: formulario recibido de actividad
+        :return: URL de redireccion
+        """
+        self.object = form.save()
+        actividad_form = ActividadFormSet(self.request.POST, instance=self.object)
+        if actividad_form.is_valid():
+            actividad_form.save()
+            order = [form.instance.id for form in actividad_form.ordered_forms]
+            if hasattr(self.object, 'set_actividad_order'):
+                self.object.set_actividad_order(order)
+
+            return HttpResponseRedirect(self.get_success_url())
+
+        return render(self.request, self.get_template_names(), {'form': form,
+                                                                'actividad_form': actividad_form},
+                      context_instance=RequestContext(self.request))
+
+flujo_edit = UpdateFlujo.as_view()
+
+
+class DeleteFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissionMixin, DeleteView):
+    """
+    Vista de Eliminacion de Flujos
+    """
+    model = Flujo
+    template_name = 'core/flujo/flujo_delete.html'
+    permission_required = 'project.delete_flujo'
+    context_object_name = 'flujo'
+
+    def get_proyecto(self):
+        return self.get_object().proyecto
+
+    def get_permission_object(self):
+        return self.get_object().proyecto
+
+    def get_success_url(self):
+        return reverse_lazy('flujo_list', kwargs={'project_pk': self.get_object().proyecto.id})
+
+
+flujo_delete = DeleteFlujo.as_view()

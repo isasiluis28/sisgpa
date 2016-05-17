@@ -29,8 +29,8 @@
         <td>{{ f.nombre }}</td>
         <td>{{ f.actividad_set.count }}</td>
         <td ><a href="{% url 'flujo_detail' f.id %}"><span class="glyphicon glyphicon-eye-open"></span></a> </td>
-        {% if "edit_flujo" in proyecto_perms %}<td><a href="#"><span class="glyphicon glyphicon-edit"></span></a></td>{% endif %}
-        {% if "remove_flujo" in proyecto_perms %}<td><a href="#"><span class="glyphicon glyphicon-trash"></span></a></td>{% endif %}
+        {% if "edit_flujo" in proyecto_perms %}<td><a href="{% url 'flujo_update' f.id %}"><span class="glyphicon glyphicon-edit"></span></a></td>{% endif %}
+        {% if "remove_flujo" in proyecto_perms %}<td><a href="{% url 'flujo_delete' f.id %}"><span class="glyphicon glyphicon-trash"></span></a></td>{% endif %}
     </tr>
     {% endfor %}
 {% endblock %}

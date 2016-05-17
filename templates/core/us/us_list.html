@@ -11,7 +11,7 @@
 {% block inside_content %}
     <h4><strong>Proyecto: </strong><td>{{ view.project }}</td></h4>
 
-    {% if "create_us" in proyecto_perms %}<p><a href="#" class="fa fa-plus-circle"> Agregar</a></p>{% endif %}
+    {% if "create_us" in proyecto_perms %}<p><a href="{% url 'us_create' view.project.id %}" class="fa fa-plus-circle"> Agregar</a></p>{% endif %}
 
     <h3>User Stories</h3>
     <!-- Buscador -->
@@ -46,11 +46,9 @@
                         <strong>Prioriodad: </strong>{{ us.get_prioridad_display }}
                 </div>
                 <div class="panel-footer">
-                    <a href="#"><i class="fa fa-eye fa-fw"></i></a>
-                    {% if "edit_us" in proyecto_perms %}<a href="#"><i
-                            class="fa fa-pencil fa-fw"></i></a>{% endif %}
-                    {% if "remove_us" in proyecto_perms %}<a href="#"><i
-                            class="fa fa-trash-o fa-fw"></i></a>{% endif %}
+                    <a href="{% url 'us_detail' us.id %}"><span class="glyphicon glyphicon-eye-open"></span> </a>
+                    {% if "edit_us" in proyecto_perms %}<a href="{% url 'us_update' us.id %}"><span class="glyphicon glyphicon-edit"></span></a>{% endif %}
+                    {% if "remove_us" in proyecto_perms %}<a href="{% url 'us_delete' us.id %}"><span class="glyphicon glyphicon-trash"></span> </a>{% endif %}
                     {% if us.estado != 5  and us.estado != 4%}
                         {% if "cancel_us" in proyecto_perms %}<a href="#"><i class="fa fa-times"></i></a> {% endif %}
                     {% endif %}

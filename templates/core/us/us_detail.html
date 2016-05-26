@@ -18,7 +18,7 @@
         {% if userstory.estado == 2 %}{# Si el User Story está en curso #}
             {% if "regactivity_us" in proyecto_perms or 'register_my_us' in us_perms %}<li><a href="#" class="fa fa-pencil-square-o"> Registrar Avance</a></li>{% endif %}
             {% if "edit_us" in proyecto_perms or 'edit_my_us' in us_perms%}<li><a href="#" class="fa fa-clock-o"> Historial</a></li>{% endif %}
-        {% elif userstory.estado == 3 %}
+        {% elif userstory.estado == 3 %}{# Si el User Story está pendiente de aprobación #}
             {% if "aprove_us" in proyecto_perms %}<li><a href="#" class="fa fa-check-circle"> Aprobar User Story</a></li>{% endif %}
             {% if "aprove_us" in proyecto_perms %}<li><a href="#" class="fa fa-times-circle"> Rechazar User Story</a></li>{% endif %}
         {% endif %}

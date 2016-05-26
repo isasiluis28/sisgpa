@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse_lazy
 from django.db import models
+from django.utils import timezone
+from django.db.models import Sum
 from django.db.models.signals import m2m_changed
 from django.shortcuts import get_object_or_404
 from guardian.shortcuts import assign_perm, remove_perm, get_perms, get_perms_for_model
@@ -11,6 +14,9 @@ from reversion import revisions as reversion
 
 
 class Proyecto(models.Model):
+    """
+    Modelo de Proyecto del sistema
+    """
     ESTADOS = (
         ('EP', 'En Produccion'),
         ('CO', 'Completado'),
@@ -58,6 +64,19 @@ class Proyecto(models.Model):
     def get_absolute_url(self):
         return reverse_lazy('project_detail', args=[self.pk])
 
+    def get_horas_estimadas(self):
+        return self.userstory_set.aggregate(total=Sum('tiempo_estimado'))['total']
+
+    def get_horas_trabajadas(self):
+        return self.userstory_set.aggregate(total=Sum('tiempo_registrado'))['total']
+
+    def _get_progreso(self):
+        us_total = self.userstory_set.count() - self.userstory_set.filter(estado=5).count()
+        us_aprobados = self.userstory_set.filter(estado=4).count()
+        progreso = float(us_aprobados) / us_total * 100 if us_total > 0 else 0
+        return int(progreso)
+    progreso = property(_get_progreso)
+
     def clean(self):
         try:
             if self.fecha_inicio > self.fecha_fin:
@@ -70,6 +89,9 @@ class Proyecto(models.Model):
 
 
 class MiembroEquipo(models.Model):
+    """
+    Modelo que relaciona los diferentes miembros en un proyecto.
+    """
     proyecto = models.ForeignKey(Proyecto)
     usuario = models.ForeignKey(User)
     roles = models.ManyToManyField(Group)
@@ -93,6 +115,9 @@ class MiembroEquipo(models.Model):
 
 
 class Sprint(models.Model):
+    """
+    Modelo que representa los sprints del proyecto.
+    """
     proyecto = models.ForeignKey(Proyecto)
     nombre = models.CharField(max_length=30)
     fecha_inicio = models.DateField()
@@ -128,7 +153,7 @@ class Flujo(models.Model):
 
 class Actividad(models.Model):
     """
-    las actividades representan las distintas etapas de las que se compone un flujo
+    Las actividades representan las distintas etapas de las que se compone un flujo.
     """
 
     nombre = models.CharField(max_length=30)
@@ -141,8 +166,10 @@ class Actividad(models.Model):
         order_with_respect_to = 'flujo'
 
 
-
 class UserStory(models.Model):
+    """
+    Modelo de User Stories. Representan cada funcionalidad desde la perspectiva del cliente que debe realizar el sistema
+    """
     ACTIVIDAD_ESTADOS = (
         (1, 'A Hacer'),
         (2, 'Haciendo'),
@@ -178,6 +205,14 @@ class UserStory(models.Model):
 
     def __unicode__(self):
         return self.nombre
+
+    def _get_progreso(self):
+        progreso = float(self.tiempo_registrado) / self.tiempo_estimado * 100 #porcentaje del progreso
+        return int(progreso if progreso <= 100 else 100)
+    progreso = property(_get_progreso)
+
+    def get_absolute_url(self):
+        return reverse_lazy('us_detail', args=[self.pk])
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
@@ -225,3 +260,22 @@ m2m_changed.connect(add_permissions_team_member, sender=MiembroEquipo.roles.thro
                     dispatch_uid='add_permissions_signal')
 
 
+class Nota(models.Model):
+    """
+    Manejo de notas adjuntas relacionadas a un User Story, estás entradas representan
+    constancias de los cambios, como cantidad de horas trabajadas, en un user story.
+    """
+    estado_choices = ((1, 'Inactivo'), (2, 'En curso'), (3, 'Pendiente Aprobacion'), (4, 'Aprobado'), (5,'Cancelado'),)
+    mensaje = models.TextField(help_text='Mensaje de descripcion de los avances o motivo de cancelacion', null=True, blank=True)
+    fecha = models.DateTimeField(default=timezone.now)
+    tiempo_registrado = models.IntegerField(default=0)
+    horas_a_registrar = models.IntegerField(default=0)
+    desarrollador = models.ForeignKey(User, null=True)
+    sprint = models.ForeignKey(Sprint, null=True)
+    actividad = models.ForeignKey(Actividad, null=True)
+    estado = models.IntegerField(choices=estado_choices, default=0)
+    estado_actividad = models.IntegerField(choices=UserStory.estado_actividad_choices, null=True)
+    user_story = models.ForeignKey(UserStory)
+
+    def __unicode__(self):
+        return '{}({}): {}'.format(self.desarrollador, self.fecha, self.horas_a_registrar)

@@ -99,8 +99,7 @@ class AddFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMixin, 
         if actividad_form.is_valid():
             actividad_form.save()
             order = [form.instance.id for form in actividad_form.ordered_forms]
-            if hasattr(self.object, 'set_actividad_order'):
-                self.object.set_actividad_order(order)
+            self.object.set_actividad_order(order)
             return HttpResponseRedirect(self.get_success_url())
 
         return render(
@@ -159,8 +158,7 @@ class UpdateFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissi
         if actividad_form.is_valid():
             actividad_form.save()
             order = [form.instance.id for form in actividad_form.ordered_forms]
-            if hasattr(self.object, 'set_actividad_order'):
-                self.object.set_actividad_order(order)
+            self.object.set_actividad_order(order)
 
             return HttpResponseRedirect(self.get_success_url())
 

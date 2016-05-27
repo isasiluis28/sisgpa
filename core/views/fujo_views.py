@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models.aggregates import Sum
@@ -15,6 +16,9 @@ from core.views.views import GlobalPermissionMixin, ActiveProjectRequiredMixin, 
 
 
 class FlujoList(LoginRequiredMixin, GlobalPermissionMixin, ListView):
+    """
+     Vista de los Flujos.
+    """
     model = Flujo
     template_name = 'core/flujo/flujo_list.html'
     permission_required = 'core.view_project'
@@ -41,21 +45,34 @@ flujo_list = FlujoList.as_view()
 
 
 class FlujoDetail(LoginRequiredMixin, GlobalPermissionMixin, DetailView):
+    """
+     Vista del detalle de los flujos.
+    """
     model = Flujo
     template_name = 'core/flujo/flujo_detail.html'
     permission_required = 'core.view_project'
     context_object_name = 'flujo'
 
     def get_permission_object(self):
+        """
+
+        :return: Objeto por el cual comprobar el permiso.
+        """
         return self.get_object().proyecto
 
     def get_context_data(self, **kwargs):
+        """
+        Agregar lista de actividades al contexto.
+
+        :param kwargs: diccionario de argumentos claves.
+        :return: contexto.
+        """
         context = super(FlujoDetail, self).get_context_data(**kwargs)
         context['actividades'] = [[a, a.userstory_set.count()] for a in self.object.actividad_set.all()]
         context['act_us'] = [a.userstory_set.order_by('-prioridad') for a in self.object.actividad_set.all()]
-        us = self.object.proyecto.userstory_set.filter(actividad__flujo=self.object)  # User Stories del Flujo
+        us = self.object.proyecto.userstory_set.filter(actividad__flujo=self.object)  # User Stories del Flujo.
         time = us.aggregate(registrado=Sum('tiempo_registrado'),
-                            estimado=Sum('tiempo_estimado'))  # Aggregate retorna None en vez de 0
+                            estimado=Sum('tiempo_estimado'))  # Aggregate retorna None en vez de 0.
         context.update(time)
         return context
 
@@ -64,6 +81,9 @@ flujo_detail = FlujoDetail.as_view()
 
 
 class AddFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMixin, CreateView):
+    """
+     Vista que agrega un flujo al sistema.
+    """
     model = Flujo
     template_name = 'core/flujo/flujo_form.html'
     form_class = FlujoCreateForm
@@ -76,20 +96,41 @@ class AddFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMixin, 
         return self.proyecto
 
     def get_permission_object(self):
+        """
+
+        :return:  Objeto por el cual comprobar el permiso.
+        """
         if not self.proyecto:
             self.proyecto = get_object_or_404(Proyecto, pk=self.kwargs['project_pk'])
         return self.proyecto
 
     def get_context_data(self, **kwargs):
+        """
+         Agregar datos al contexto.
+
+
+        :param kwargs: argumentos clave.
+        :return: contexto.
+        """
         context = super(AddFlujo, self).get_context_data(**kwargs)
         context['current_action'] = 'Agregar'
         context['actividad_form'] = ActividadFormSet(self.request.POST if self.request.method == 'POST' else None)
         return context
 
     def get_success_url(self):
+        """
+
+        :return: la url de redireccion a la vista de los detalles del flujo agregado.
+        """
         return reverse('flujo_detail', kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
+        """
+         Comprobar validez del formulario. Crea una instancia de flujo para asociar con la actividad.
+
+        :param form: formulario recibido.
+        :return: URL de redireccion.
+        """
         self.object = form.save(commit=False)
         self.object.proyecto = self.get_proyecto()
         self.object.proyecto.estado = 'EP'
@@ -115,7 +156,7 @@ add_flujo = AddFlujo.as_view()
 
 class UpdateFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissionMixin, UpdateView):
     """
-    View que agrega un flujo al sistema
+    View que actualiza un flujo al sistema.
     """
     model = Flujo
     template_name = 'core/flujo/flujo_form.html'
@@ -131,8 +172,10 @@ class UpdateFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissi
     def get_context_data(self, **kwargs):
         """
         Agregar datos al contexto
-        :param kwargs: argumentos clave
-        :return: contexto
+
+
+        :param kwargs: argumentos clave.
+        :return: contexto.
         """
         context = super(UpdateFlujo, self).get_context_data(**kwargs)
         context['current_action'] = "Editar"
@@ -149,10 +192,11 @@ class UpdateFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissi
 
     def form_valid(self, form):
         """
-        Comprobar validez del formulario. Crea una instancia de flujo para asociar con la actividad
-        :param form: formulario recibido
-        :param actividad_form: formulario recibido de actividad
-        :return: URL de redireccion
+        Comprobar validez del formulario. Crea una instancia de flujo para asociar con la actividad.
+
+        :param form: formulario recibido.
+        :param actividad_form: formulario recibido de actividad.
+        :return: URL de redireccion.
         """
         self.object = form.save()
         actividad_form = ActividadFormSet(self.request.POST, instance=self.object)
@@ -173,7 +217,7 @@ flujo_edit = UpdateFlujo.as_view()
 
 class DeleteFlujo(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissionMixin, DeleteView):
     """
-    Vista de Eliminacion de Flujos
+    Vista de Eliminacion de Flujos.
     """
     model = Flujo
     template_name = 'core/flujo/flujo_delete.html'

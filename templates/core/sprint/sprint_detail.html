@@ -1,6 +1,7 @@
 {% extends 'core/sprint/base.html' %}
 {% load static %}
 {% load guardian_tags %}
+{% block title %}{{ sprints }}{% endblock %}
 
 {% block breadcrumb %}
     <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
@@ -9,6 +10,7 @@
     <li class="active">{{ sprint }}</li>
 {% endblock %}
 
+{% block header %}{{ sprint.nombre | title }} {% endblock %}
 {% block inside_content %}
     <ul class="list-inline">
         {% get_obj_perms user for sprint.proyecto as "proyecto_perms" %}

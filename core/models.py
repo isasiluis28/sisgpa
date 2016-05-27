@@ -152,6 +152,10 @@ class Actividad(models.Model):
     def __unicode__(self):
         return self.nombre
 
+    class Meta:
+        order_with_respect_to = 'flujo'
+
+
 
 class UserStory(models.Model):
     """

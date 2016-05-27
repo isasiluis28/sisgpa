@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from django.contrib.auth.models import User, Group
@@ -11,6 +12,9 @@ from reversion import revisions as reversion
 
 
 class Proyecto(models.Model):
+    """
+        Modelo del proyecto del sistema.
+    """
     ESTADOS = (
         ('EP', 'En Produccion'),
         ('CO', 'Completado'),
@@ -30,6 +34,11 @@ class Proyecto(models.Model):
     equipo = models.ManyToManyField(User, through='MiembroEquipo')
 
     class Meta:
+        # Los permisos estaran asociados a los proyectos, por lo que todos los permisos de ABM de las entidades
+        # dependientes del proyecto, deben crearse como permisos de proyecto
+        # en vez de 'add', 'change' y 'delete', los permisos personalizados seran 'create', 'edit' y 'remove' para
+        # evitar confusiones con los por defecto.
+
         permissions = (
             ('list_all_projects', 'listar los proyectos disponibles'),
             ('view_project', 'ver el proyecto'),
@@ -65,11 +74,14 @@ class Proyecto(models.Model):
                     {'fecha_inicio': 'Fecha de inicio no puede ser mayor a la fecha de fin.'}
                 )
         except TypeError:
-            # si se trata de una fecha nula, el propio clean del field se encarga de validar
+            # si se trata de una fecha nula, el propio clean del field se encarga de validar.
             pass
 
 
 class MiembroEquipo(models.Model):
+    """
+        Miembros del equipo de un proyecto con un rol específico.
+    """
     proyecto = models.ForeignKey(Proyecto)
     usuario = models.ForeignKey(User)
     roles = models.ManyToManyField(Group)
@@ -82,7 +94,7 @@ class MiembroEquipo(models.Model):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         super(MiembroEquipo, self).save(force_insert, force_update, using, update_fields)
-        # se agrega el permiso de view_project al usuario dentro del proyecto hecho
+        # se agrega el permiso de view_project al usuario dentro del proyecto hecho.
         assign_perm('view_project', self.usuario, self.proyecto)
 
     def delete(self, using=None, keep_parents=False):
@@ -93,6 +105,9 @@ class MiembroEquipo(models.Model):
 
 
 class Sprint(models.Model):
+    """
+     Manejo de los sprints del proyecto.
+    """
     proyecto = models.ForeignKey(Proyecto)
     nombre = models.CharField(max_length=30)
     fecha_inicio = models.DateField()
@@ -112,7 +127,7 @@ class Sprint(models.Model):
 
 class Flujo(models.Model):
     """
-    Los flujos que forman parte de un proyecto
+    Los flujos que forman parte de un proyecto.
     """
     nombre = models.CharField(max_length=30)
     proyecto = models.ForeignKey(Proyecto)
@@ -128,7 +143,7 @@ class Flujo(models.Model):
 
 class Actividad(models.Model):
     """
-    las actividades representan las distintas etapas de las que se compone un flujo
+    las actividades representan las distintas etapas de las que se compone un flujo.
     """
 
     nombre = models.CharField(max_length=30)
@@ -143,6 +158,10 @@ class Actividad(models.Model):
 
 
 class UserStory(models.Model):
+    """
+     Manejo de los User Stories. Los User Stories representan a cada
+    funcionalidad desde la perspectiva del cliente que debe realizar el sistema.
+    """
     ACTIVIDAD_ESTADOS = (
         (1, 'A Hacer'),
         (2, 'Haciendo'),
@@ -183,7 +202,7 @@ class UserStory(models.Model):
              update_fields=None):
         old_dev = None
 
-        # si ya existe el objeto
+        # si ya existe el objeto.
         if self.pk is not None:
             old_instance = get_object_or_404(UserStory, pk=self.pk)
             old_dev = old_instance.desarrolador
@@ -223,5 +242,3 @@ reversion.register(
 from core.signals import add_permissions_team_member
 m2m_changed.connect(add_permissions_team_member, sender=MiembroEquipo.roles.through,
                     dispatch_uid='add_permissions_signal')
-
-

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import transaction
@@ -16,6 +17,9 @@ from core.views.views import GlobalPermissionMixin, ActiveProjectRequiredMixin, 
 
 
 class USList(LoginRequiredMixin, GlobalPermissionMixin, ListView):
+    """
+     Lista de los User Story.
+    """
     model = UserStory
     template_name = 'core/us/us_list.html'
     permission_required = 'core.view_project'
@@ -43,18 +47,28 @@ us_list = USList.as_view()
 
 
 class USDetail(LoginRequiredMixin, GlobalPermissionMixin, DetailView):
+    """
+        Vista de los detalles de los User Story.
+    """
     model = UserStory
     permission_required = 'core.view_project'
     template_name = 'core/us/us_detail.html'
     context_object_name = 'userstory'
 
     def get_permission_object(self):
+        """
+
+        :return: objeto al cual corresponde el permiso.
+        """
         return self.get_object().proyecto
 
 us_detail = USDetail.as_view()
 
 
 class AddUserStory(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMixin, CreateView):
+    """
+     Vista que agrega un User Story a sistema.
+    """
     model = UserStory
     template_name = 'core/us/us_form.html'
     permission_required = 'core.create_us'
@@ -76,14 +90,28 @@ class AddUserStory(ActiveProjectRequiredMixin, LoginRequiredMixin, CreateViewMix
         return form_class
 
     def get_permission_object(self):
+        """
+
+        :return: Objeto por el cual comprobar el permiso.
+        """
         if not self.proyecto:
             self.proyecto = self.get_proyecto()
         return self.get_proyecto()
 
     def get_success_url(self):
+        """
+
+        :return: la url de redireccion a la vista de los detalles del user story agregado.
+        """
         return reverse('us_detail', kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
+        """
+         Comprobar Validez del formulario.
+
+        :param form: Dormulario recibido.
+        :return: URL de redireccion.
+        """
         self.object = form.save(commit=False)
         self.object.proyecto = self.get_proyecto()
         self.object.proyecto.estado = 'EP'
@@ -101,7 +129,7 @@ add_us = AddUserStory.as_view()
 
 class UpdateUserStory(ActiveProjectRequiredMixin, LoginRequiredMixin, UpdateView):
     """
-    View que actualiza un user story del sistema
+    View que actualiza un user story del sistema.
     """
     model = UserStory
     template_name = 'core/us/us_form.html'
@@ -111,11 +139,12 @@ class UpdateUserStory(ActiveProjectRequiredMixin, LoginRequiredMixin, UpdateView
 
     def dispatch(self, request, *args, **kwargs):
         """
-        Comprobacion de permisos hecha antes de la llamada al dispatch que inicia el proceso de respuesta al request de la url
-        :param request: request hecho por el cliente
-        :param args: argumentos adicionales posicionales
-        :param kwargs: argumentos adicionales en forma de diccionario
-        :return: PermissionDenied si el usuario no cuenta con permisos
+        Comprobacion de permisos hecha antes de la llamada al dispatch que inicia el proceso de respuesta al request de la url.
+
+        :param request: request hecho por el cliente.
+        :param args: argumentos adicionales posicionales.
+        :param kwargs: argumentos adicionales en forma de diccionario.
+        :return: PermissionDenied si el usuario no cuenta con permisos.
         """
         if 'edit_us' in get_perms(request.user, self.get_object().proyecto):
             return super(UpdateUserStory, self).dispatch(request, *args, **kwargs)
@@ -134,9 +163,10 @@ class UpdateUserStory(ActiveProjectRequiredMixin, LoginRequiredMixin, UpdateView
 
     def get_context_data(self, **kwargs):
         """
-        Agregar datos al contexto
-        :param kwargs: argumentos clave
-        :return: contexto
+        Agregar datos al contexto.
+
+        :param kwargs: argumentos clave.
+        :return: contexto.
         """
         context = super(UpdateUserStory, self).get_context_data(**kwargs)
         context['current_action'] = "Editar"
@@ -150,9 +180,10 @@ class UpdateUserStory(ActiveProjectRequiredMixin, LoginRequiredMixin, UpdateView
 
     def form_valid(self, form):
         """
-        Comprobar validez del formulario. Crea una instancia de user story
-        :param form: formulario recibido
-        :return: URL de redireccion
+        Comprobar validez del formulario. Crea una instancia de user story.
+
+        :param form: formulario recibido.
+        :return: URL de redireccion.
         """
         if form.has_changed():
             with transaction.atomic(), reversion.create_revision():
@@ -167,7 +198,7 @@ update_us = UpdateUserStory.as_view()
 
 class DeleteUserStory(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissionMixin, DeleteView):
     """
-    Vista de Eliminacion de User Stories
+    Vista de Eliminacion de User Stories.
     """
     model = UserStory
     template_name = 'core/us/us_delete.html'
@@ -185,21 +216,3 @@ class DeleteUserStory(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPerm
 
 
 delete_us = DeleteUserStory.as_view()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

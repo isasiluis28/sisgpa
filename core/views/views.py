@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.core.exceptions import PermissionDenied
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
@@ -21,11 +22,11 @@ class CreateViewMixin(GlobalPermissionMixin):
 def index_view(request):
 
     """
-       Metodo que redirecciona a la pagina de inicio si esta autenticado el usuario
+       Metodo que redirecciona a la pagina de inicio si esta autenticado el usuario.
 
-       @param request: Http request
-       @type  request: Htttptrequest
-       @return: render al template del index
+       @param request: Http request.
+       @type  request: Htttptrequest.
+       @return: render al template del index.
     """
 
     if request.user.is_authenticated():

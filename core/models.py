@@ -242,7 +242,7 @@ class UserStory(models.Model):
         default_permissions = ()
         permissions = (
             ('edit_my_us', 'editar mis user stories'),
-            ('register_my_us', 'registrar avances en mi user story')
+            ('register_my_us', 'registrar avances en mi user story'),
         )
         verbose_name = 'user story'
         verbose_name_plural = 'user stories'
@@ -274,7 +274,7 @@ class Nota(models.Model):
     sprint = models.ForeignKey(Sprint, null=True)
     actividad = models.ForeignKey(Actividad, null=True)
     estado = models.IntegerField(choices=estado_choices, default=0)
-    estado_actividad = models.IntegerField(choices=UserStory.estado_actividad_choices, null=True)
+    estado_actividad = models.IntegerField(choices=UserStory.ACTIVIDAD_ESTADOS, null=True)
     user_story = models.ForeignKey(UserStory)
 
     def __unicode__(self):

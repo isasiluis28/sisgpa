@@ -194,3 +194,12 @@ class AddToSprintFormset(BaseFormSet):
                 userstories.append(us)
 
                 userstories.append(us)
+
+
+
+class RegistrarActividadForm(forms.ModelForm):
+    horas_a_registrar = forms.IntegerField(min_value=0, error_messages={'required':'Ingrese cantidad de horas'}, initial=0)
+
+    class Meta:
+        model = UserStory
+        fields = ["estado_actividad"]

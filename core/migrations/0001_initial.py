@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+import django.utils.timezone
 
 
 class Migration(migrations.Migration):
@@ -45,6 +46,20 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Miembros del Equipo',
                 'default_permissions': (),
             },
+        ),
+        migrations.CreateModel(
+            name='Nota',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('mensaje', models.TextField(blank=True, help_text='Mensaje de descripcion de los avances o motivo de cancelacion', null=True)),
+                ('fecha', models.DateTimeField(default=django.utils.timezone.now)),
+                ('tiempo_registrado', models.IntegerField(default=0)),
+                ('horas_a_registrar', models.IntegerField(default=0)),
+                ('estado', models.IntegerField(choices=[(1, 'Inactivo'), (2, 'En curso'), (3, 'Pendiente Aprobacion'), (4, 'Aprobado'), (5, 'Cancelado')], default=0)),
+                ('estado_actividad', models.IntegerField(choices=[(1, 'A Hacer'), (2, 'Haciendo'), (3, 'Hecho')], null=True)),
+                ('actividad', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='core.Actividad')),
+                ('desarrollador', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+            ],
         ),
         migrations.CreateModel(
             name='Proyecto',
@@ -104,6 +119,16 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'user stories',
                 'permissions': (('edit_my_us', 'editar mis user stories'), ('register_my_us', 'registrar avances en mi user story')),
             },
+        ),
+        migrations.AddField(
+            model_name='nota',
+            name='sprint',
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='core.Sprint'),
+        ),
+        migrations.AddField(
+            model_name='nota',
+            name='user_story',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.UserStory'),
         ),
         migrations.AddField(
             model_name='miembroequipo',

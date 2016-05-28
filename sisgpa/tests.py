@@ -164,7 +164,7 @@ class RolesTest(TestCase):
         self.assertContains(response, 'This field is required.')
 
 
-#
+
 class FlujoTest(TestCase):
     def setUp(self):
         u = User.objects.create_superuser('test', 'temp@email.com', 'test')

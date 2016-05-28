@@ -75,11 +75,15 @@ class RolForm(forms.ModelForm):
     """
     Formulario para el manejo de roles.
     """
-    perms_proyecto_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'project' in perm.codename]
-    perms_proyecto_list.extend([(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'proyecto' in perm.codename])
+    perms_proyecto_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if
+                           'project' in perm.codename]
+    perms_proyecto_list.extend(
+        [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'proyecto' in perm.codename])
     perms_us_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'us' in perm.codename]
-    perms_flujo_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'flujo' in perm.codename]
-    perms_sprint_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'sprint' in perm.codename]
+    perms_flujo_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if
+                        'flujo' in perm.codename]
+    perms_sprint_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if
+                         'sprint' in perm.codename]
 
     perms_proyecto = forms.MultipleChoiceField(
         perms_proyecto_list,
@@ -118,67 +122,75 @@ class FlujoCreateForm(forms.ModelForm):
     """
     Formulario para la creación de flujos.
     """
+
     class Meta:
         model = Flujo
         fields = ('nombre',)
 
-ActividadFormSet = inlineformset_factory(Flujo, Actividad, can_order=True, can_delete=True, max_num=None, extra=1, fields='__all__',)
+
+ActividadFormSet = inlineformset_factory(Flujo, Actividad, can_order=True, can_delete=True, max_num=None, extra=1,
+                                         fields='__all__', )
 
 
 class SprintCreateBaseForm(forms.ModelForm):
     """
-    Formulario para la creacion de sprint.
+    Formulario base para la creacion de Sprints
     """
+
     class Meta:
         model = Sprint
-        fields = ('nombre', 'fecha_inicio', 'fecha_fin')
+        fields = ['nombre', 'fecha_inicio', 'proyecto']
 
     def clean(self):
         """
-        Se chequea que las fechas de los sprint no se solapen.
+        Chequea que  las fechas  de los Sprints no se solapen
         """
-
-        # si existe algun error en el form no se hace validaciones.
         if any(self.errors):
             return
 
-        if 'fecha_inicio' and 'proyecto' in self.cleaned_data:
-            fecha_inicio = self.cleaned_data['fecha_inicio']
+        if 'inicio' and 'proyecto' in self.cleaned_data:
+            inicio = self.cleaned_data['fecha_inicio']
             proyecto = self.cleaned_data['proyecto']
-
-            fin = fecha_inicio + datetime.timedelta(days=proyecto.duracion_sprint)
-            hoy = timezone.now().date()
-
-            sprint_list = proyecto.sprint_set.filter(fecha_inicio__lte=fin, fecha_fin__gte=fecha_inicio).exclude(pk=self.instance.pk)
-            if (fecha_inicio < hoy) and (fecha_inicio is not self.instance.fecha_inicio):
-                raise ValidationError({'fecha_inicio': 'Fecha de inicio debe ser mayor o igual a la fecha actual'})
-            if sprint_list.exists():
-                raise ValidationError({'fecha_inicio': 'Durante este periodo ya existe el sprint ' + str(sprint_list[0].nombre)})
-            if fecha_inicio < proyecto.fecha_inicio:
-                raise ValidationError({'fecha_inicio': 'Fecha de inicio debe ser mayor a la fecha de inicio del proyecto.'})
-            if fecha_inicio >= proyecto.fecha_fin:
-                raise ValidationError({'fecha_inicio': 'Fecha de inicio debe ser menor a la fecha de fin del proyecto'})
+            fin = inicio + datetime.timedelta(days=proyecto.duracion_sprint)
+            today = timezone.now().date()
+            sprint = proyecto.sprint_set.filter(fecha_inicio__lte=fin, fecha_fin__gte=inicio).exclude(
+                pk=self.instance.pk)
+            if (inicio < today) & (inicio != self.instance.fecha_inicio):
+                raise ValidationError({'fecha_inicio': 'Fecha inicio debe ser mayor o igual a la fecha actual '})
+            if sprint.exists():
+                raise ValidationError({'fecha_inicio': 'Durante este tiempo existe  ' + str(sprint[0].nombre)})
+            if inicio < proyecto.fecha_inicio:
+                raise ValidationError(
+                    {'fecha_inicio': 'Fecha inicio debe ser mayor o igual a la fecha de inicio del proyecto'})
+            if inicio >= proyecto.fecha_fin:
+                raise ValidationError({'fecha_inicio': 'Fecha inicio debe ser menor a la fecha de fin del proyecto'})
             if fin > proyecto.fecha_fin:
                 raise ValidationError({'fecha_inicio': 'Fin del sprint supera la fecha de fin del proyecto'})
 
 
 class AddToSprintForm(forms.Form):
+    """
+    formulario para la agregacion de userStory, desarrollador y flujo a un Sprint
+    """
     userstory = forms.ModelChoiceField(queryset=UserStory.objects.all())
     desarrollador = forms.ModelChoiceField(queryset=User.objects.all())
     flujo = forms.ModelChoiceField(queryset=Flujo.objects.all())
 
 
-class AddToSprintFormSet(BaseFormSet):
+class AddToSprintFormset(BaseFormSet):
     def clean(self):
-        # si algun form del formset tiene errores, no se valida, se retorna directo.
+        """
+        Chequea que no se incluye el mismo user story más de una vez en el sprint
+        """
         if any(self.errors):
-            return
+            return  # si algún form del formset tiene errores, no se hace la validación
 
-        us_list = []
-
+        userstories = []
         for form in self.forms:
             if 'userstory' in form.cleaned_data and not form in self.deleted_forms:
                 us = form.cleaned_data['userstory']
-                if us in us_list:
-                    raise forms.ValidationError('Un mismo User Story solo puede aparecer una vez en el sprint.')
-                us_list.append(us)
+                if us in userstories:
+                    raise forms.ValidationError("Un mismo User Story puede aparecer sólo una vez en el sprint.")
+                userstories.append(us)
+
+                userstories.append(us)

@@ -40,6 +40,9 @@ def index_view(request):
 
 def get_selected_perms(POST):
     perm_list = POST.getlist('perms_proyecto')
+    perm_list.extend(POST.getlist('perms_us'))
+    perm_list.extend(POST.getlist('perms_flujo'))
+    perm_list.extend(POST.getlist('perms_sprint'))
     return perm_list
 
 

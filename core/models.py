@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.db import models
 from django.db.models.signals import m2m_changed
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from guardian.shortcuts import assign_perm, remove_perm, get_perms, get_perms_for_model
 from reversion import revisions as reversion
 
@@ -26,7 +27,7 @@ class Proyecto(models.Model):
     nombre_corto = models.CharField(max_length=20)
     nombre_largo = models.CharField(max_length=40)
     estado = models.CharField(max_length=2, choices=ESTADOS, default='IN')
-    fecha_inicio = models.DateField()
+    fecha_inicio = models.DateField(default=timezone.now)
     fecha_fin = models.DateField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     duracion_sprint = models.PositiveIntegerField(default=30) # en dias
@@ -154,7 +155,6 @@ class Actividad(models.Model):
 
     class Meta:
         order_with_respect_to = 'flujo'
-
 
 
 class UserStory(models.Model):

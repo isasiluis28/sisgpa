@@ -5,6 +5,8 @@ from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse_lazy
 from django.db import models
+from django.utils import timezone
+from django.db.models import Sum
 from django.db.models.signals import m2m_changed
 from django.shortcuts import get_object_or_404
 from guardian.shortcuts import assign_perm, remove_perm, get_perms, get_perms_for_model
@@ -13,7 +15,7 @@ from reversion import revisions as reversion
 
 class Proyecto(models.Model):
     """
-        Modelo del proyecto del sistema.
+    Modelo de Proyecto del sistema
     """
     ESTADOS = (
         ('EP', 'En Produccion'),
@@ -67,6 +69,19 @@ class Proyecto(models.Model):
     def get_absolute_url(self):
         return reverse_lazy('project_detail', args=[self.pk])
 
+    def get_horas_estimadas(self):
+        return self.userstory_set.aggregate(total=Sum('tiempo_estimado'))['total']
+
+    def get_horas_trabajadas(self):
+        return self.userstory_set.aggregate(total=Sum('tiempo_registrado'))['total']
+
+    def _get_progreso(self):
+        us_total = self.userstory_set.count() - self.userstory_set.filter(estado=5).count()
+        us_aprobados = self.userstory_set.filter(estado=4).count()
+        progreso = float(us_aprobados) / us_total * 100 if us_total > 0 else 0
+        return int(progreso)
+    progreso = property(_get_progreso)
+
     def clean(self):
         try:
             if self.fecha_inicio > self.fecha_fin:
@@ -106,7 +121,7 @@ class MiembroEquipo(models.Model):
 
 class Sprint(models.Model):
     """
-     Manejo de los sprints del proyecto.
+    Modelo que representa los sprints del proyecto.
     """
     proyecto = models.ForeignKey(Proyecto)
     nombre = models.CharField(max_length=30)
@@ -143,7 +158,7 @@ class Flujo(models.Model):
 
 class Actividad(models.Model):
     """
-    las actividades representan las distintas etapas de las que se compone un flujo.
+    Las actividades representan las distintas etapas de las que se compone un flujo.
     """
 
     nombre = models.CharField(max_length=30)
@@ -154,7 +169,6 @@ class Actividad(models.Model):
 
     class Meta:
         order_with_respect_to = 'flujo'
-
 
 
 class UserStory(models.Model):
@@ -198,6 +212,14 @@ class UserStory(models.Model):
     def __unicode__(self):
         return self.nombre
 
+    def _get_progreso(self):
+        progreso = float(self.tiempo_registrado) / self.tiempo_estimado * 100 #porcentaje del progreso
+        return int(progreso if progreso <= 100 else 100)
+    progreso = property(_get_progreso)
+
+    def get_absolute_url(self):
+        return reverse_lazy('us_detail', args=[self.pk])
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         old_dev = None
@@ -226,7 +248,7 @@ class UserStory(models.Model):
         default_permissions = ()
         permissions = (
             ('edit_my_us', 'editar mis user stories'),
-            ('register_my_us', 'registrar avances en mi user story')
+            ('register_my_us', 'registrar avances en mi user story'),
         )
         verbose_name = 'user story'
         verbose_name_plural = 'user stories'
@@ -242,3 +264,4 @@ reversion.register(
 from core.signals import add_permissions_team_member
 m2m_changed.connect(add_permissions_team_member, sender=MiembroEquipo.roles.through,
                     dispatch_uid='add_permissions_signal')
+

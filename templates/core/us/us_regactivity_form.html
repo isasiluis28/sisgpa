@@ -1,0 +1,66 @@
+{% extends 'core/us/base.html' %}
+{% load bootstrap3 %}
+{% load guardian_tags %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{% url 'project_detail' userstory.proyecto_id %}">{{ userstory.proyecto }}</a></li>
+    <li><a href="{% url 'us_list' userstory.proyecto_id %}">User Stories</a></li>
+    <li><a href="{% url 'us_detail' userstory.id %}">{{ userstory }}</a></li>
+    <li class="active">Registrar Avance</li>
+{% endblock %}
+
+{% block inside_content %}
+<div class="row">
+    <div class="col-lg-6">
+        <div class="well">
+            <p><strong>Proyecto Asociado:</strong> {{ userstory.proyecto }}</p>
+            <p><strong>Nombre: </strong>{{ userstory.nombre }}</p>
+                    <p><strong>Prioridad: </strong>{{ userstory.get_prioridad_display }}</p>
+                    <p><strong>Valor de negocio: </strong>{{ userstory.valor_negocio }}</p>
+                    <p><strong>Valor Técnico: </strong>{{ userstory.valor_tecnico }}</p>
+                    <p><strong>Último cambio: </strong>{{ userstory.ultimo_cambio }}</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            <span class="fa fa-bars"> Estado Actual</span>
+                        </div>
+                        <div class="panel-body">
+                            <p><strong>Sprint: </strong>{{ userstory.sprint }}</p>
+                            <p><strong>Desarrollador: </strong>{{ userstory.desarrollador }}</p>
+                            <p><strong>Flujo: </strong>{{ userstory.actividad.flujo }} | <strong>Actividad: </strong>{{ userstory.actividad }} | <strong>Estado actual: </strong>{{ userstory.get_estado_actividad_display }}</p>
+                            <p><strong>Tiempo Estimado (horas): </strong>{{ userstory.tiempo_estimado }}</p>
+                            <p><strong>Tiempo registrado (horas): </strong>{{ userstory.tiempo_registrado }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+</div>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="row">
+            {{ formset.non_form_errors }}
+            <div class="col-lg-12">
+                {% for f in formset.forms %}{% bootstrap_form f %}{% endfor %}
+            </div>
+            {{ formset.management_form }}
+        </div>
+        <div class="row">
+            <div class="col-lg-4">{% bootstrap_field form.horas_a_registrar layout='horizontal' %}</div>
+            {% if form.actividad %}
+                <div class="col-lg-4">{% bootstrap_field form.actividad layout='horizontal' %}</div>
+            {% endif %}
+            <div class="col-lg-4">{% bootstrap_field form.estado_actividad layout='horizontal' %}</div>
+        </div>
+        <div class="row">
+        {% buttons submit='Guardar' reset="Reset" %}
+            <a href="javascript:history.back()">
+                <button type="button" class="btn btn-danger">Cancelar</button>
+            </a>
+        {% endbuttons %}
+        </div>
+    </form>
+{% endblock %}

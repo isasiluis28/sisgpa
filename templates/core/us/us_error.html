@@ -1,0 +1,36 @@
+{% extends 'core/us/base.html' %}
+{% load guardian_tags %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
+    <li><a href="{% url 'project_detail' userstory.proyecto_id %}">{{ userstory.proyecto }}</a></li>
+    <li><a href="{% url 'us_list' userstory.proyecto_id %}">User Stories</a></li>
+    <li><a href="{% url 'us_detail' userstory.id %}">{{ userstory }}</a></li>
+    <li class="active">Registrar Avance</li>
+{% endblock %}
+
+{% block header %}Error en {{ userstory.nombre | title}} {% endblock %}
+{% block inside_content %}
+    <div class="row center-block">
+        <div class="panel panel-red">
+                    <div class="panel-heading">
+                        <h4><span class="fa fa-times"> </span>Error </h4>
+                    </div>
+                    <div class="panel-body">
+                        {% if error == "SPRINT_VENCIDO" %}
+                            <p>No puede registrar su avance en el User Story <strong>{{ userstory.nombre | title }}</strong> debido a que el último sprint al cual se ha asociado el mismo ya <strong>ha llegado a su fecha de finalización.</strong> Este User Story estará disponible recien cuando se lo incluya en un nuevo sprint.</p>
+                            <p>El último sprint al que fue incorporado el mismo fue <a href="{% url 'project:sprint_detail' userstory.sprint.pk %}"> {{ userstory.sprint }}</a> </p>
+                        {% endif %}
+                        {% if error == "MENOR_PRIORIDAD" %}
+                            <p>No puede registrar su avance en el User Story <strong>{{ userstory.nombre | title }}</strong> debido a que en la actividad <strong>{{ userstory.actividad }}</strong> del flujo <strong>{{ userstory.flujo }}</strong> en el sprint actual <strong>({{ userstory.sprint }})</strong> hay otros User Story de mayor prioridad.</p>
+                            <p>La prioridad actual de este User Story es: <strong>{{ userstory.get_prioridad_display }}</strong>.</p>
+                        {% endif %}
+                        {% if error == "OTRO_ESTADO" %}
+                            <p>No puede registrar su avance en el User Story  <strong>{{ userstory.nombre | title }}</strong> debido a que el mismo se encuentra en estado <strong>{{ userstory.get_estado_display }}</strong> y no en el estado <strong>En Curso</strong>. </p>
+                        {% endif %}
+                    </div>
+                </div>
+    </div>
+    <p><a class="fa fa-step-backward" href="{% url 'project:product_backlog' userstory.proyecto.id %}"> Volver a User Stories</a></p>
+
+{% endblock %}

@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>core.views.sprint_views &mdash; sisgpa 3.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="sisgpa 3.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for core.views.sprint_views</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.db.models.query_utils</span> <span class="kn">import</span> <span class="n">Q</span>
+<span class="kn">from</span> <span class="nn">django.forms.formsets</span> <span class="kn">import</span> <span class="n">formset_factory</span>
+<span class="kn">from</span> <span class="nn">django.forms.models</span> <span class="kn">import</span> <span class="n">modelform_factory</span>
+<span class="kn">from</span> <span class="nn">django.forms.widgets</span> <span class="kn">import</span> <span class="n">SelectDateWidget</span><span class="p">,</span> <span class="n">HiddenInput</span>
+<span class="kn">from</span> <span class="nn">django.http.response</span> <span class="kn">import</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">render</span>
+<span class="kn">from</span> <span class="nn">django.template.context</span> <span class="kn">import</span> <span class="n">RequestContext</span>
+<span class="kn">from</span> <span class="nn">django.views.generic.detail</span> <span class="kn">import</span> <span class="n">DetailView</span>
+<span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">CreateView</span><span class="p">,</span> <span class="n">UpdateView</span>
+<span class="kn">from</span> <span class="nn">django.views.generic.list</span> <span class="kn">import</span> <span class="n">ListView</span>
+<span class="kn">from</span> <span class="nn">guardian.mixins</span> <span class="kn">import</span> <span class="n">LoginRequiredMixin</span>
+<span class="kn">from</span> <span class="nn">guardian.shortcuts</span> <span class="kn">import</span> <span class="n">get_perms</span>
+
+<span class="kn">from</span> <span class="nn">core.forms</span> <span class="kn">import</span> <span class="n">SprintCreateBaseForm</span><span class="p">,</span> <span class="n">AddToSprintForm</span><span class="p">,</span> <span class="n">AddToSprintFormSet</span>
+<span class="kn">from</span> <span class="nn">core.models</span> <span class="kn">import</span> <span class="n">Sprint</span><span class="p">,</span> <span class="n">Proyecto</span><span class="p">,</span> <span class="n">Flujo</span><span class="p">,</span> <span class="n">UserStory</span>
+<span class="kn">from</span> <span class="nn">core.views.views</span> <span class="kn">import</span> <span class="n">GlobalPermissionMixin</span><span class="p">,</span> <span class="n">ActiveProjectRequiredMixin</span><span class="p">,</span> <span class="n">CreateViewMixin</span>
+
+
+<div class="viewcode-block" id="SprintList"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintList">[docs]</a><span class="k">class</span> <span class="nc">SprintList</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">GlobalPermissionMixin</span><span class="p">,</span> <span class="n">ListView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">      Vista de Listado de Sprint en el sistema.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Sprint</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;core/sprint/sprint_list.html&#39;</span>
+    <span class="n">permission_required</span> <span class="o">=</span> <span class="s1">&#39;core.view_project&#39;</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s1">&#39;sprints&#39;</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="SprintList.get_objeto"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintList.get_objeto">[docs]</a>    <span class="k">def</span> <span class="nf">get_objeto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Proyecto</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;project_pk&#39;</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="SprintList.get_permission_object"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintList.get_permission_object">[docs]</a>    <span class="k">def</span> <span class="nf">get_permission_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Obtener el permiso de un objeto.</span>
+
+<span class="sd">        :return: retorna el objeto proyecto donde se comprueba el permiso.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_objeto</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_objeto</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SprintList.get_context_data"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintList.get_context_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Agregar datos al contexto.</span>
+
+<span class="sd">        :param kwargs:argumentos clave.</span>
+<span class="sd">        :return:  retorna el contexto.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SprintList</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;proyecto_perms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_perms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_objeto</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+<div class="viewcode-block" id="SprintList.get_queryset"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintList.get_queryset">[docs]</a>    <span class="k">def</span> <span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        obtiene el projecto correspondiente al seleccionado previamente.</span>
+
+<span class="sd">        :return: Los objetos Spritn del proyecto previamente seleccionado.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Sprint</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">proyecto</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_objeto</span><span class="p">())</span></div></div>
+
+
+<span class="n">sprint_list</span> <span class="o">=</span> <span class="n">SprintList</span><span class="o">.</span><span class="n">as_view</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="SprintDetail"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintDetail">[docs]</a><span class="k">class</span> <span class="nc">SprintDetail</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">GlobalPermissionMixin</span><span class="p">,</span> <span class="n">DetailView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Vista del detalle de un Sprint en el sistema.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Sprint</span>
+    <span class="n">permission_required</span> <span class="o">=</span> <span class="s1">&#39;core.view_project&#39;</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;core/sprint/sprint_detail.html&#39;</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s1">&#39;sprint&#39;</span>
+
+<div class="viewcode-block" id="SprintDetail.get_permission_object"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintDetail.get_permission_object">[docs]</a>    <span class="k">def</span> <span class="nf">get_permission_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Obtener el permiso de un objeto.</span>
+
+<span class="sd">        :return: retorna el objeto proyecto donde se comprueba el permiso.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span><span class="o">.</span><span class="n">proyecto</span></div>
+
+<div class="viewcode-block" id="SprintDetail.get_context_data"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintDetail.get_context_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Agregar datos al context.</span>
+
+<span class="sd">        :param kwargs:argumentos clave.</span>
+<span class="sd">        :return:  retorna el contexto.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SprintDetail</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;userstory_list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">userstory_set</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-prioridad&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">context</span></div></div>
+
+
+<span class="n">sprint_detail</span> <span class="o">=</span> <span class="n">SprintDetail</span><span class="o">.</span><span class="n">as_view</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="SprintCreate"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintCreate">[docs]</a><span class="k">class</span> <span class="nc">SprintCreate</span><span class="p">(</span><span class="n">ActiveProjectRequiredMixin</span><span class="p">,</span> <span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">CreateViewMixin</span><span class="p">,</span> <span class="n">CreateView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Vista para agregar un Sprint en el sistema y añadir este sprint, un desarrollador y una actividad al user Story.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Sprint</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;core/sprint/sprint_form.html&#39;</span>
+    <span class="n">permission_required</span> <span class="o">=</span> <span class="s1">&#39;core.create_sprint&#39;</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">modelform_factory</span><span class="p">(</span><span class="n">Sprint</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">SprintCreateBaseForm</span><span class="p">,</span>
+                                   <span class="n">widgets</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fecha_inicio&#39;</span><span class="p">:</span> <span class="n">SelectDateWidget</span><span class="p">,</span> <span class="s1">&#39;proyecto&#39;</span><span class="p">:</span> <span class="n">HiddenInput</span><span class="p">},</span>
+                                   <span class="n">fields</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nombre&#39;</span><span class="p">,</span> <span class="s1">&#39;fecha_inicio&#39;</span><span class="p">,</span> <span class="s1">&#39;proyecto&#39;</span><span class="p">})</span>
+    <span class="n">formset</span> <span class="o">=</span> <span class="n">formset_factory</span><span class="p">(</span><span class="n">AddToSprintForm</span><span class="p">,</span> <span class="n">formset</span><span class="o">=</span><span class="n">AddToSprintFormSet</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">project</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="c1"># flujo = None</span>
+
+<div class="viewcode-block" id="SprintCreate.get_proyecto"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintCreate.get_proyecto">[docs]</a>    <span class="k">def</span> <span class="nf">get_proyecto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Proyecto</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;project_pk&#39;</span><span class="p">])</span></div>
+
+    <span class="c1"># def get_initial(self):</span>
+    <span class="c1">#     initial = {&#39;project&#39;: self.get_proyecto()}</span>
+    <span class="c1">#     return initial</span>
+
+<div class="viewcode-block" id="SprintCreate.get_permission_object"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintCreate.get_permission_object">[docs]</a>    <span class="k">def</span> <span class="nf">get_permission_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Obtener el permiso de un objeto.</span>
+
+<span class="sd">        :return:  retorna el objeto proyecto donde se comprueba el permiso.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proyecto</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proyecto</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__filtar_formset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formset</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">userformset</span> <span class="ow">in</span> <span class="n">formset</span><span class="o">.</span><span class="n">forms</span><span class="p">:</span>
+            <span class="n">userformset</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;desarrollador&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">miembroequipo__proyecto</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_proyecto</span><span class="p">())</span>
+            <span class="n">userformset</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;flujo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">Flujo</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">proyecto</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_proyecto</span><span class="p">())</span>
+            <span class="n">userformset</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;userstory&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">UserStory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Q</span><span class="p">(</span><span class="n">proyecto</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_proyecto</span><span class="p">()),</span> <span class="n">Q</span><span class="p">(</span><span class="n">estado</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">estado</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="SprintCreate.get_context_data"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintCreate.get_context_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Agrega el contexto de los formsets formados por desarrolladores, flujos, userstories.</span>
+
+<span class="sd">        :param kwargs: args extra.</span>
+<span class="sd">        :return: el contexto necesario para los datos.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SprintCreate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">formset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span> <span class="k">else</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__filtar_formset</span><span class="p">(</span><span class="n">formset</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;current_action&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;agregar&#39;</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;formset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formset</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+<div class="viewcode-block" id="SprintCreate.get_success_url"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintCreate.get_success_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: la url de redireccion a la vista  de los detalles del sprint agregado.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;sprint_detail&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pk&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">id</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="SprintCreate.form_valid"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.SprintCreate.form_valid">[docs]</a>    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        guarda el desarrolador, actividad y sprint asociado al proyecto dentro de un us.</span>
+
+<span class="sd">        :param form: formulario del sprint.</span>
+<span class="sd">        :return:URL de evento correcto,</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">proyecto</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_proyecto</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">fecha_fin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">fecha_inicio</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_proyecto</span><span class="p">()</span><span class="o">.</span><span class="n">duracion_sprint</span><span class="p">)</span>
+        <span class="n">proyecto</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="s1">&#39;EP&#39;</span>
+        <span class="n">proyecto</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">formset_b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">formset_b</span><span class="o">.</span><span class="n">has_changed</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">formset_b</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">subform</span> <span class="ow">in</span> <span class="n">formset_b</span><span class="p">:</span>
+                    <span class="n">new_us</span> <span class="o">=</span> <span class="n">subform</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;userstory&#39;</span><span class="p">]</span>
+                    <span class="n">new_flujo</span> <span class="o">=</span> <span class="n">subform</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;flujo&#39;</span><span class="p">]</span>
+                    <span class="c1"># self.flujo = new_flujo.</span>
+                    <span class="n">new_dev</span> <span class="o">=</span> <span class="n">subform</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;desarrollador&#39;</span><span class="p">]</span>
+                    <span class="n">new_us</span><span class="o">.</span><span class="n">desarrolador</span> <span class="o">=</span> <span class="n">new_dev</span>
+                    <span class="n">new_us</span><span class="o">.</span><span class="n">sprint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span>
+                    <span class="n">new_us</span><span class="o">.</span><span class="n">actividad</span> <span class="o">=</span> <span class="n">new_flujo</span><span class="o">.</span><span class="n">actividad_set</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+                    <span class="n">new_us</span><span class="o">.</span><span class="n">estado_actividad</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">new_us</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># el us pasa a estar en curso por incluirse en el sprint.</span>
+                    <span class="n">new_us</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_template_names</span><span class="p">(),</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s1">&#39;formset&#39;</span><span class="p">:</span> <span class="n">formset_b</span><span class="p">,},</span>
+                              <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">())</span></div></div>
+
+
+<span class="n">sprint_create</span> <span class="o">=</span> <span class="n">SprintCreate</span><span class="o">.</span><span class="n">as_view</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="UpdateSprintView"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.UpdateSprintView">[docs]</a><span class="k">class</span> <span class="nc">UpdateSprintView</span><span class="p">(</span><span class="n">ActiveProjectRequiredMixin</span><span class="p">,</span> <span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">GlobalPermissionMixin</span><span class="p">,</span>
+                       <span class="n">UpdateView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Vista para actualizar los datos del Sprint y  del UserStory que son el desarrollador, la actividad y el Sprint.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Sprint</span>
+    <span class="n">permission_required</span> <span class="o">=</span> <span class="s1">&#39;project.edit_sprint&#39;</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;core/sprint/sprint_form.html&#39;</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">modelform_factory</span><span class="p">(</span><span class="n">Sprint</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">SprintCreateBaseForm</span><span class="p">,</span>
+                                   <span class="n">widgets</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fecha_inicio&#39;</span><span class="p">:</span> <span class="n">SelectDateWidget</span><span class="p">,</span> <span class="s1">&#39;proyecto&#39;</span><span class="p">:</span> <span class="n">HiddenInput</span><span class="p">},</span>
+                                   <span class="n">fields</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nombre&#39;</span><span class="p">,</span> <span class="s1">&#39;fecha_inicio&#39;</span><span class="p">,</span> <span class="s1">&#39;proyecto&#39;</span><span class="p">})</span>
+    <span class="n">UserStoryFormset</span> <span class="o">=</span> <span class="n">formset_factory</span><span class="p">(</span><span class="n">AddToSprintForm</span><span class="p">,</span> <span class="n">formset</span><span class="o">=</span><span class="n">AddToSprintFormSet</span><span class="p">,</span> <span class="n">can_delete</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">formset</span> <span class="o">=</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="UpdateSprintView.get_proyecto"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.UpdateSprintView.get_proyecto">[docs]</a>    <span class="k">def</span> <span class="nf">get_proyecto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span><span class="o">.</span><span class="n">proyecto</span></div>
+
+<div class="viewcode-block" id="UpdateSprintView.get_permission_object"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.UpdateSprintView.get_permission_object">[docs]</a>    <span class="k">def</span> <span class="nf">get_permission_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         permiso para add, edit o delete</span>
+
+<span class="sd">        :return: los permisos.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span><span class="o">.</span><span class="n">proyecto</span></div>
+
+<div class="viewcode-block" id="UpdateSprintView.get_success_url"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.UpdateSprintView.get_success_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return:la url de redireccion a la vista de los detalles del sprint modificado.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;sprint_detail&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pk&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">id</span><span class="p">})</span></div>
+
+    <span class="k">def</span> <span class="nf">__filtrar_formset__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">formset</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">userformset</span> <span class="ow">in</span> <span class="n">formset</span><span class="o">.</span><span class="n">forms</span><span class="p">:</span>
+            <span class="n">userformset</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;desarrollador&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">miembroequipo__proyecto</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">proyecto</span><span class="p">)</span>
+            <span class="n">userformset</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;flujo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">Flujo</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">proyecto</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">proyecto</span><span class="p">)</span>
+            <span class="n">userformset</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;userstory&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">UserStory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">proyecto</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">proyecto</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UpdateSprintView.get_context_data"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.UpdateSprintView.get_context_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Especifica los datos de contexto a pasar al template,</span>
+
+<span class="sd">        :param kwargs: Diccionario con parametros con nombres clave.</span>
+<span class="sd">        :return: los datos de contexto.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">UpdateSprintView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">current_us</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span><span class="o">.</span><span class="n">userstory_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">formset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UserStoryFormset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span> <span class="k">else</span> <span class="bp">None</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;userstory&#39;</span><span class="p">:</span> <span class="n">us</span><span class="p">,</span> <span class="s1">&#39;flujo&#39;</span><span class="p">:</span> <span class="n">us</span><span class="o">.</span><span class="n">actividad</span><span class="o">.</span><span class="n">flujo</span><span class="p">,</span> <span class="s1">&#39;desarrollador&#39;</span><span class="p">:</span> <span class="n">us</span><span class="o">.</span><span class="n">desarrolador</span><span class="p">}</span> <span class="k">for</span> <span class="n">us</span> <span class="ow">in</span> <span class="n">current_us</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__filtrar_formset__</span><span class="p">(</span><span class="n">formset</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;current_action&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Editar&#39;</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;formset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">formset</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+<div class="viewcode-block" id="UpdateSprintView.form_valid"><a class="viewcode-back" href="../../../core.views.html#core.views.sprint_views.UpdateSprintView.form_valid">[docs]</a>    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Guarda el desarrollador, actividad y sprint asociado al un projecto dentro de un User Story.</span>
+
+<span class="sd">        :param form: formulario del sprint.</span>
+<span class="sd">        :return: vuelve a la pagina de detalle del sprint.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">fecha_fin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">fecha_inicio</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">proyecto</span><span class="o">.</span><span class="n">duracion_sprint</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">formsetb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UserStoryFormset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">formsetb</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">proccessed_forms</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">subform</span> <span class="ow">in</span> <span class="n">formsetb</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">subform</span><span class="o">.</span><span class="n">has_changed</span><span class="p">()</span> <span class="ow">and</span> <span class="s1">&#39;userstory&#39;</span> <span class="ow">in</span> <span class="n">subform</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">:</span>
+                    <span class="n">new_userStory</span> <span class="o">=</span> <span class="n">subform</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;userstory&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">subform</span> <span class="ow">in</span> <span class="n">formsetb</span><span class="o">.</span><span class="n">deleted_forms</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">new_userStory</span> <span class="ow">in</span> <span class="n">proccessed_forms</span><span class="p">:</span>
+                        <span class="c1"># desaciamos los user story que se eliminaron del form.</span>
+                        <span class="n">new_userStory</span><span class="o">.</span><span class="n">desarrollador</span> <span class="o">=</span> <span class="bp">None</span>
+                        <span class="n">new_userStory</span><span class="o">.</span><span class="n">sprint</span> <span class="o">=</span> <span class="bp">None</span>
+                        <span class="n">new_userStory</span><span class="o">.</span><span class="n">actividad</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_flujo</span> <span class="o">=</span> <span class="n">subform</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;flujo&#39;</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">flujo</span> <span class="o">=</span> <span class="n">new_flujo</span>
+                        <span class="n">new_desarrollador</span> <span class="o">=</span> <span class="n">subform</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;desarrollador&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">new_userStory</span><span class="o">.</span><span class="n">estado</span> <span class="o">!=</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">new_userStory</span><span class="o">.</span><span class="n">estado</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>  <span class="c1"># si el user story no ha finalizado.</span>
+                            <span class="n">new_userStory</span><span class="o">.</span><span class="n">desarrollador</span> <span class="o">=</span> <span class="n">new_desarrollador</span>
+                            <span class="n">new_userStory</span><span class="o">.</span><span class="n">sprint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span>
+                            <span class="n">new_userStory</span><span class="o">.</span><span class="n">actividad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">flujo</span><span class="o">.</span><span class="n">actividad_set</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+                            <span class="n">new_userStory</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="n">new_userStory</span><span class="o">.</span><span class="n">estado_actividad</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">new_userStory</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                    <span class="n">proccessed_forms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_userStory</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__filtrar_formset__</span><span class="p">(</span><span class="n">formsetb</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_template_names</span><span class="p">(),</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s1">&#39;formset&#39;</span><span class="p">:</span> <span class="n">formsetb</span><span class="p">},</span>
+                      <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">))</span></div></div>
+
+<span class="n">sprint_update</span> <span class="o">=</span> <span class="n">UpdateSprintView</span><span class="o">.</span><span class="n">as_view</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Oscar Gimenez, Luis Isasi, Eulalio David Cabrera.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>core.models &mdash; sisgpa 3.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="sisgpa 3.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for core.models</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">unicode_literals</span>
+
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">Group</span>
+<span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse_lazy</span>
+<span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.db.models.signals</span> <span class="kn">import</span> <span class="n">m2m_changed</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span> <span class="nn">guardian.shortcuts</span> <span class="kn">import</span> <span class="n">assign_perm</span><span class="p">,</span> <span class="n">remove_perm</span><span class="p">,</span> <span class="n">get_perms</span><span class="p">,</span> <span class="n">get_perms_for_model</span>
+<span class="kn">from</span> <span class="nn">reversion</span> <span class="kn">import</span> <span class="n">revisions</span> <span class="k">as</span> <span class="n">reversion</span>
+
+
+<div class="viewcode-block" id="Proyecto"><a class="viewcode-back" href="../../core.html#core.admin.Proyecto">[docs]</a><span class="k">class</span> <span class="nc">Proyecto</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Modelo del proyecto del sistema.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ESTADOS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s1">&#39;EP&#39;</span><span class="p">,</span> <span class="s1">&#39;En Produccion&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;CO&#39;</span><span class="p">,</span> <span class="s1">&#39;Completado&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;AP&#39;</span><span class="p">,</span> <span class="s1">&#39;Aprobado&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;CA&#39;</span><span class="p">,</span> <span class="s1">&#39;Cancelado&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;IN&#39;</span><span class="p">,</span> <span class="s1">&#39;Inactivo&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">nombre_corto</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+    <span class="n">nombre_largo</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+    <span class="n">estado</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">ESTADOS</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;IN&#39;</span><span class="p">)</span>
+    <span class="n">fecha_inicio</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+    <span class="n">fecha_fin</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+    <span class="n">fecha_creacion</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now_add</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">duracion_sprint</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span> <span class="c1"># en dias</span>
+    <span class="n">descripcion</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">equipo</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">User</span><span class="p">,</span> <span class="n">through</span><span class="o">=</span><span class="s1">&#39;MiembroEquipo&#39;</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="c1"># Los permisos estaran asociados a los proyectos, por lo que todos los permisos de ABM de las entidades</span>
+        <span class="c1"># dependientes del proyecto, deben crearse como permisos de proyecto</span>
+        <span class="c1"># en vez de &#39;add&#39;, &#39;change&#39; y &#39;delete&#39;, los permisos personalizados seran &#39;create&#39;, &#39;edit&#39; y &#39;remove&#39; para</span>
+        <span class="c1"># evitar confusiones con los por defecto.</span>
+
+        <span class="n">permissions</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;list_all_projects&#39;</span><span class="p">,</span> <span class="s1">&#39;listar los proyectos disponibles&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;view_project&#39;</span><span class="p">,</span> <span class="s1">&#39;ver el proyecto&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;aprove_project&#39;</span><span class="p">,</span> <span class="s1">&#39;aprobar el proyecto&#39;</span><span class="p">),</span>
+
+            <span class="p">(</span><span class="s1">&#39;create_sprint&#39;</span><span class="p">,</span> <span class="s1">&#39;agregar sprint&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;edit_sprint&#39;</span><span class="p">,</span> <span class="s1">&#39;editar sprint&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;remove_sprint&#39;</span><span class="p">,</span> <span class="s1">&#39;eliminar sprint&#39;</span><span class="p">),</span>
+
+            <span class="p">(</span><span class="s1">&#39;create_flujo&#39;</span><span class="p">,</span> <span class="s1">&#39;agregar flujo&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;edit_flujo&#39;</span><span class="p">,</span> <span class="s1">&#39;editar flujo&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;remove_flujo&#39;</span><span class="p">,</span> <span class="s1">&#39;eliminar flujo&#39;</span><span class="p">),</span>
+
+            <span class="p">(</span><span class="s1">&#39;create_us&#39;</span><span class="p">,</span> <span class="s1">&#39;agregar user story&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;edit_us&#39;</span><span class="p">,</span> <span class="s1">&#39;editar user story&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;remove_us&#39;</span><span class="p">,</span> <span class="s1">&#39;eliminar user story&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;prior_us&#39;</span><span class="p">,</span> <span class="s1">&#39;asignar prioridad a user story&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;regactivity_us&#39;</span><span class="p">,</span> <span class="s1">&#39;registrar avances en user stories&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;aprove_us&#39;</span><span class="p">,</span> <span class="s1">&#39;aprobar user stories completados&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;cancel_us&#39;</span><span class="p">,</span> <span class="s1">&#39;cancelar user stories completados&#39;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nombre_corto</span>
+
+<div class="viewcode-block" id="Proyecto.get_absolute_url"><a class="viewcode-back" href="../../core.html#core.admin.Proyecto.get_absolute_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_absolute_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse_lazy</span><span class="p">(</span><span class="s1">&#39;project_detail&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Proyecto.clean"><a class="viewcode-back" href="../../core.html#core.admin.Proyecto.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fecha_inicio</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">fecha_fin</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s1">&#39;fecha_inicio&#39;</span><span class="p">:</span> <span class="s1">&#39;Fecha de inicio no puede ser mayor a la fecha de fin.&#39;</span><span class="p">}</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="c1"># si se trata de una fecha nula, el propio clean del field se encarga de validar.</span>
+            <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="MiembroEquipo"><a class="viewcode-back" href="../../core.html#core.admin.MiembroEquipo">[docs]</a><span class="k">class</span> <span class="nc">MiembroEquipo</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Miembros del equipo de un proyecto con un rol específico.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">proyecto</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Proyecto</span><span class="p">)</span>
+    <span class="n">usuario</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Group</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">default_permissions</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="s1">&#39;Miembros del Equipo&#39;</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;usuario&#39;</span><span class="p">,</span> <span class="s1">&#39;proyecto&#39;</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="MiembroEquipo.save"><a class="viewcode-back" href="../../core.html#core.admin.MiembroEquipo.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_insert</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">force_update</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+             <span class="n">update_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MiembroEquipo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">force_insert</span><span class="p">,</span> <span class="n">force_update</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">update_fields</span><span class="p">)</span>
+        <span class="c1"># se agrega el permiso de view_project al usuario dentro del proyecto hecho.</span>
+        <span class="n">assign_perm</span><span class="p">(</span><span class="s1">&#39;view_project&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">usuario</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proyecto</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MiembroEquipo.delete"><a class="viewcode-back" href="../../core.html#core.admin.MiembroEquipo.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">keep_parents</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">rol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">rol</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="n">remove_perm</span><span class="p">(</span><span class="n">perm</span><span class="o">.</span><span class="n">codename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">usuario</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">proyecto</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MiembroEquipo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">using</span><span class="p">,</span> <span class="n">keep_parents</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Sprint"><a class="viewcode-back" href="../../core.html#core.admin.Sprint">[docs]</a><span class="k">class</span> <span class="nc">Sprint</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Manejo de los sprints del proyecto.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">proyecto</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Proyecto</span><span class="p">)</span>
+    <span class="n">nombre</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">fecha_inicio</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+    <span class="n">fecha_fin</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nombre</span>
+
+<div class="viewcode-block" id="Sprint.get_absolute_url"><a class="viewcode-back" href="../../core.html#core.admin.Sprint.get_absolute_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_absolute_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse_lazy</span><span class="p">(</span><span class="s1">&#39;sprint_detail&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">])</span></div>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">default_permissions</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s1">&#39;sprints&#39;</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="s1">&#39;sprint&#39;</span></div>
+
+
+<div class="viewcode-block" id="Flujo"><a class="viewcode-back" href="../../core.html#core.admin.Flujo">[docs]</a><span class="k">class</span> <span class="nc">Flujo</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Los flujos que forman parte de un proyecto.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nombre</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">proyecto</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Proyecto</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nombre</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">default_permissions</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="s1">&#39;flujo&#39;</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s1">&#39;flujos&#39;</span></div>
+
+
+<div class="viewcode-block" id="Actividad"><a class="viewcode-back" href="../../core.html#core.admin.Actividad">[docs]</a><span class="k">class</span> <span class="nc">Actividad</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    las actividades representan las distintas etapas de las que se compone un flujo.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nombre</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">flujo</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Flujo</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nombre</span></div>
+
+
+<div class="viewcode-block" id="UserStory"><a class="viewcode-back" href="../../core.html#core.admin.UserStory">[docs]</a><span class="k">class</span> <span class="nc">UserStory</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Manejo de los User Stories. Los User Stories representan a cada</span>
+<span class="sd">    funcionalidad desde la perspectiva del cliente que debe realizar el sistema.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ACTIVIDAD_ESTADOS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;A Hacer&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Haciendo&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Hecho&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">ESTADOS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Inactivo&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;En Curso&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Pendiente de Aprobacion&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;Aprobado&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;Cancelado&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">PRIORIDADES</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Baja&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Media&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Alta&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">nombre</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">descripcion</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">prioridad</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">PRIORIDADES</span><span class="p">)</span>
+    <span class="n">valor_negocio</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">valor_tecnico</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">tiempo_estimado</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">()</span>
+    <span class="n">tiempo_registrado</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ultimo_cambio</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">auto_now</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">estado</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">ESTADOS</span><span class="p">)</span>
+    <span class="n">estado_actividad</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">ACTIVIDAD_ESTADOS</span><span class="p">)</span>
+    <span class="n">proyecto</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Proyecto</span><span class="p">)</span>
+    <span class="n">desarrolador</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;auth.User&#39;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">sprint</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Sprint</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">actividad</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Actividad</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__unicode__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nombre</span>
+
+<div class="viewcode-block" id="UserStory.save"><a class="viewcode-back" href="../../core.html#core.admin.UserStory.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_insert</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">force_update</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+             <span class="n">update_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">old_dev</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="c1"># si ya existe el objeto.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">old_instance</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">UserStory</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+            <span class="n">old_dev</span> <span class="o">=</span> <span class="n">old_instance</span><span class="o">.</span><span class="n">desarrolador</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UserStory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">force_insert</span><span class="p">,</span> <span class="n">force_update</span><span class="p">,</span> <span class="n">using</span><span class="p">,</span> <span class="n">update_fields</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">old_dev</span> <span class="ow">and</span> <span class="n">old_dev</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">desarrolador</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">get_perms</span><span class="p">(</span><span class="n">old_dev</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
+                <span class="n">remove_perm</span><span class="p">(</span><span class="n">perm</span><span class="p">,</span> <span class="n">old_dev</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proyecto</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">desarrolador</span><span class="p">:</span>
+                <span class="n">memebership</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+                    <span class="n">MiembroEquipo</span><span class="p">,</span> <span class="n">usuario</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">desarrolador</span><span class="p">,</span> <span class="n">proyecto</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">proyecto</span>
+                <span class="p">)</span>
+                <span class="n">permisos_us</span> <span class="o">=</span> <span class="n">get_perms_for_model</span><span class="p">(</span><span class="n">UserStory</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">rol</span> <span class="ow">in</span> <span class="n">memebership</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">rol</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">permisos_us</span><span class="p">:</span>
+                            <span class="n">assign_perm</span><span class="p">(</span><span class="n">perm</span><span class="o">.</span><span class="n">codename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">desarrolador</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">default_permissions</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="n">permissions</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="s1">&#39;edit_my_us&#39;</span><span class="p">,</span> <span class="s1">&#39;editar mis user stories&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;register_my_us&#39;</span><span class="p">,</span> <span class="s1">&#39;registrar avances en mi user story&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="s1">&#39;user story&#39;</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s1">&#39;user stories&#39;</span></div>
+
+
+<span class="n">reversion</span><span class="o">.</span><span class="n">register</span><span class="p">(</span>
+    <span class="n">UserStory</span><span class="p">,</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">[</span>
+        <span class="s1">&#39;nombre&#39;</span><span class="p">,</span> <span class="s1">&#39;descripcion&#39;</span><span class="p">,</span> <span class="s1">&#39;prioridad&#39;</span><span class="p">,</span> <span class="s1">&#39;valor_negocio&#39;</span><span class="p">,</span> <span class="s1">&#39;valor_tecnico&#39;</span><span class="p">,</span> <span class="s1">&#39;tiempo_estimado&#39;</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">core.signals</span> <span class="kn">import</span> <span class="n">add_permissions_team_member</span>
+<span class="n">m2m_changed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">add_permissions_team_member</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">MiembroEquipo</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">through</span><span class="p">,</span>
+                    <span class="n">dispatch_uid</span><span class="o">=</span><span class="s1">&#39;add_permissions_signal&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Oscar Gimenez, Luis Isasi, Eulalio David Cabrera.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

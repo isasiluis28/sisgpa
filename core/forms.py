@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 
 from django import forms
@@ -14,9 +15,9 @@ from core.models import Proyecto, Sprint, Flujo, UserStory, Actividad
 
 def __general_perms_list__():
     """
-    Devuelve una lista de permisos generales
-    :return: lista con los permisos que pueden asignarse a nivel general
-    :rtype: list
+    Devuelve una lista de permisos generales.
+    :return: lista con los permisos que pueden asignarse a nivel general.
+    :rtype: list.
     """
     permlist = []
     permlist.append(Permission.objects.get(codename="list_all_projects"))
@@ -26,8 +27,8 @@ def __general_perms_list__():
 
 def __user_and_group_permissions__():
     """
-    perimisos de grupos de usuarios
-    :return: lista con los permisos que pueden asignarse a usuarios
+    perimisos de grupos de usuarios.
+    :return: lista con los permisos que pueden asignarse a usuarios.
     """
     perms_user_list = [(perm.codename, perm.name) for perm in get_perms_for_model(User)]
     perms_group_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Group)]
@@ -38,6 +39,9 @@ def __user_and_group_permissions__():
 
 
 class UserCreateForm(UserCreationForm):
+    """
+    Formulario para la creacion de usuarios del sistema.
+    """
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
     email = forms.EmailField(required=True)
@@ -68,6 +72,9 @@ class UserEditForm(UserChangeForm):
 
 
 class RolForm(forms.ModelForm):
+    """
+    Formulario para el manejo de roles.
+    """
     perms_proyecto_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'project' in perm.codename]
     perms_proyecto_list.extend([(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'proyecto' in perm.codename])
     perms_us_list = [(perm.codename, perm.name) for perm in get_perms_for_model(Proyecto) if 'us' in perm.codename]
@@ -108,6 +115,9 @@ class RolForm(forms.ModelForm):
 
 
 class FlujoCreateForm(forms.ModelForm):
+    """
+    Formulario para la creación de flujos.
+    """
     class Meta:
         model = Flujo
         fields = ('nombre',)
@@ -116,16 +126,19 @@ ActividadFormSet = inlineformset_factory(Flujo, Actividad, can_order=True, can_d
 
 
 class SprintCreateBaseForm(forms.ModelForm):
+    """
+    Formulario para la creacion de sprint.
+    """
     class Meta:
         model = Sprint
         fields = ('nombre', 'fecha_inicio', 'fecha_fin')
 
     def clean(self):
         """
-        Se chequea que las fechas de los sprint no se solapen
+        Se chequea que las fechas de los sprint no se solapen.
         """
 
-        # si existe algun error en el form no se hace validaciones
+        # si existe algun error en el form no se hace validaciones.
         if any(self.errors):
             return
 
@@ -157,7 +170,7 @@ class AddToSprintForm(forms.Form):
 
 class AddToSprintFormSet(BaseFormSet):
     def clean(self):
-        # si algun form del formset tiene errores, no se valida, se retorna directo
+        # si algun form del formset tiene errores, no se valida, se retorna directo.
         if any(self.errors):
             return
 
@@ -169,6 +182,7 @@ class AddToSprintFormSet(BaseFormSet):
                 if us in us_list:
                     raise forms.ValidationError('Un mismo User Story solo puede aparecer una vez en el sprint.')
                 us_list.append(us)
+
 
 
 class RegistrarActividadForm(forms.ModelForm):

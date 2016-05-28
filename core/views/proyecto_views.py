@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse_lazy
@@ -16,7 +17,10 @@ from core.views.views import GlobalPermissionMixin, CreateViewMixin, ActiveProje
 
 
 class ProjectList(LoginRequiredMixin, ListView):
-    # listado de los proyectos de acuerdo a los permisos de usuario autenticado
+    """
+         Listado de Proyecto.
+    """
+    # listado de los proyectos de acuerdo a los permisos de usuario autenticado.
     model = Proyecto
     context_object_name = 'projects'
     template_name = 'core/projects/project_list.html'
@@ -32,6 +36,9 @@ project_list = ProjectList.as_view()
 
 
 class ProjectDetail(LoginRequiredMixin, GlobalPermissionMixin, DetailView):
+    """
+        Vista de Detalles de Proyecto.
+    """
     model = Proyecto
     context_object_name = 'project'
     permission_required = 'core.view_project'
@@ -48,6 +55,9 @@ project_detail = ProjectDetail.as_view()
 
 
 class ProjectCreate(LoginRequiredMixin, CreateViewMixin, CreateView):
+    """
+         Permite la creacion de Proyectos.
+    """
     model = Proyecto
     permission_required = 'core.add_proyecto'
     success_url = reverse_lazy('projects-index')
@@ -69,7 +79,14 @@ class ProjectCreate(LoginRequiredMixin, CreateViewMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        # guarda los miembros del equipo asignandolos al respectivo proyecto
+        """
+         Guarda los miembros del equipo asignandolos al respectivo proyecto.
+
+        :param form: formulario del proyecto.
+
+        :return:HttpResponse.
+        """
+
         self.object = form.save()
         formset = self.TeamMemberInlineFormSet(self.request.POST, instance=self.object)
         if formset.is_valid():
@@ -83,6 +100,9 @@ project_create = ProjectCreate.as_view()
 
 
 class ProjectUpdate(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissionMixin, UpdateView):
+    """
+      Permite la Edicion de Proyectos.
+    """
     model = Proyecto
     permission_required = 'project.change_proyecto'
     template_name = 'core/projects/project_form.html'
@@ -100,15 +120,21 @@ class ProjectUpdate(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermis
         return self.get_object()
 
     def form_valid(self, form):
+        """
+        actualiza los miembros del equipo del proyecto que se hayan especifico.
+
+        :param form:formulario de edición del proyecto.
+        :return: HttpResponse.
+        """
         self.object = form.save()
         formset = self.TeamMemberInlineFormSet(self.request.POST, instance=self.object)
         if formset.is_valid():
-            # borramos todos los permisos asociados al usuario en el proyecto antes de volver a asignar los nuevos
+            # borramos todos los permisos asociados al usuario en el proyecto antes de volver a asignar los nuevos.
             project = self.object
             for form in formset:
-                if form.has_changed():  #solo los formularios con cambios efectuados
+                if form.has_changed():  #solo los formularios con cambios efectuados.
                     user = form.cleaned_data['usuario']
-                    #si se cambia el usuario, borrar permisos del usuario anterior
+                    #si se cambia el usuario, borrar permisos del usuario anterior.
                     if 'usuario' in form.changed_data and 'usuario' in form.initial:
                         original_user = get_object_or_404(User, pk=form.initial['usuario'])
                         for perm in get_perms(original_user, project):
@@ -124,6 +150,13 @@ class ProjectUpdate(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermis
                       context_instance=RequestContext(self.request))
 
     def get_context_data(self, **kwargs):
+        """
+         Especifica los datos de contexto a pasar al template.
+
+        :param kwargs:Diccionario con parametros con nombres clave.
+
+        :return: unn objeto contexto.
+        """
         context = super(ProjectUpdate, self).get_context_data(**kwargs)
         context['accion'] = 'editar'
         context['formset'] = self.TeamMemberInlineFormSet(self.request.POST if self.request.method == 'POST' else None, instance=self.object)
@@ -133,6 +166,9 @@ project_update = ProjectUpdate.as_view()
 
 
 class ProjectDelete(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermissionMixin, DeleteView):
+    """
+    Vista para la cancelar un proyecto, Los proyectos no se eliminan se cambian a un estado cancelado.
+    """
     model = Proyecto
     template_name = 'core/projects/project_delete.html'
     success_url = reverse_lazy('projects-index')
@@ -143,8 +179,17 @@ class ProjectDelete(ActiveProjectRequiredMixin, LoginRequiredMixin, GlobalPermis
 
     def delete(self, request, *args, **kwargs):
         """
-        Llama al metodo delete() del objeto
-        y luego redirige a la url exitosa.
+          Llama al metodo delete() del objeto
+          y luego redirige a la url exitosa.
+
+
+        :param request: HttpRequest.
+
+        :param args: Se utiliza para pasar un no-keyworded , lista de argumentos de longitud variable.
+
+        :param kwargs: Nos permite pasar un número variable de argumentos de palabras clave.
+
+        :return: render al url exitosa.
         """
         self.object = self.get_object()
         success_url = self.get_success_url()

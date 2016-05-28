@@ -16,7 +16,7 @@
         {% get_obj_perms user for userstory as "us_perms" %}
         {% if "edit_us" in proyecto_perms or 'edit_my_us' in us_perms%}<li><a href="#" class="fa fa-pencil"> Editar</a></li>{% endif %}
         {% if userstory.estado == 2 %}{# Si el User Story está en curso #}
-            {% if "regactivity_us" in proyecto_perms or 'register_my_us' in us_perms %}<li><a href="#" class="fa fa-pencil-square-o"> Registrar Avance</a></li>{% endif %}
+            {% if "regactivity_us" in proyecto_perms or 'register_my_us' in us_perms %}<li><a href="{% url 'us_regactivity' userstory.id %}" class="fa fa-pencil-square-o"> Registrar Avance</a></li>{% endif %}
             {% if "edit_us" in proyecto_perms or 'edit_my_us' in us_perms%}<li><a href="#" class="fa fa-clock-o"> Historial</a></li>{% endif %}
         {% elif userstory.estado == 3 %}{# Si el User Story está pendiente de aprobación #}
             {% if "aprove_us" in proyecto_perms %}<li><a href="#" class="fa fa-check-circle"> Aprobar User Story</a></li>{% endif %}
@@ -24,8 +24,8 @@
         {% endif %}
         {% if "remove_us" in proyecto_perms %}<li><a href="#" class="fa fa-eraser"> Borrar</a></li>{% endif %}
 
-        <li><a href="#"><i class="fa fa-newspaper-o"></i> Avances</a></li>
-        <li><a href="#"><i class="fa fa-file"></i> Adjuntos</a></li>
+{#        <li><a href="#"><i class="fa fa-newspaper-o"></i> Avances</a></li>#}
+{#        <li><a href="#"><i class="fa fa-file"></i> Adjuntos</a></li>#}
         {%  if userstory.estado != 5 and userstory.estado != 4 %}
         {% if "cancel_us" in proyecto_perms %}<li><a href="#" class="fa fa-times"> Cancelar</a></li> {% endif %}
         {% endif %}

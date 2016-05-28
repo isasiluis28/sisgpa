@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>core.views.rol_views &mdash; sisgpa 3.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="sisgpa 3.0 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for core.views.rol_views</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">Group</span><span class="p">,</span> <span class="n">Permission</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.http.response</span> <span class="kn">import</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span> <span class="nn">django.views.generic.detail</span> <span class="kn">import</span> <span class="n">DetailView</span>
+<span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">CreateView</span><span class="p">,</span> <span class="n">UpdateView</span>
+<span class="kn">from</span> <span class="nn">django.views.generic.list</span> <span class="kn">import</span> <span class="n">ListView</span>
+<span class="kn">from</span> <span class="nn">guardian.mixins</span> <span class="kn">import</span> <span class="n">LoginRequiredMixin</span>
+<span class="kn">from</span> <span class="nn">guardian.shortcuts</span> <span class="kn">import</span> <span class="n">remove_perm</span><span class="p">,</span> <span class="n">get_perms</span>
+
+<span class="kn">from</span> <span class="nn">core.forms</span> <span class="kn">import</span> <span class="n">RolForm</span>
+<span class="kn">from</span> <span class="nn">core.views.views</span> <span class="kn">import</span> <span class="n">GlobalPermissionMixin</span><span class="p">,</span> <span class="n">CreateViewMixin</span><span class="p">,</span> <span class="n">get_selected_perms</span>
+
+
+<div class="viewcode-block" id="RolList"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolList">[docs]</a><span class="k">class</span> <span class="nc">RolList</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">ListView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Vista de Listado de Roles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Group</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;core/rol/rol_list.html&#39;</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s1">&#39;roles&#39;</span></div>
+
+<span class="n">rol_list</span> <span class="o">=</span> <span class="n">RolList</span><span class="o">.</span><span class="n">as_view</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="RolDetail"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolDetail">[docs]</a><span class="k">class</span> <span class="nc">RolDetail</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">DetailView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Vista de Detalles de Roles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Group</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;core/rol/rol_detail.html&#39;</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s1">&#39;rol&#39;</span></div>
+
+<span class="n">rol_detail</span> <span class="o">=</span> <span class="n">RolDetail</span><span class="o">.</span><span class="n">as_view</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="RolCreate"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolCreate">[docs]</a><span class="k">class</span> <span class="nc">RolCreate</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">CreateViewMixin</span><span class="p">,</span> <span class="n">CreateView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Permite la creacion de roles en el sistema.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Group</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;core/rol/rol_form.html&#39;</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">RolForm</span>
+    <span class="n">permission_required</span> <span class="o">=</span> <span class="s1">&#39;auth.add_group&#39;</span>
+
+<div class="viewcode-block" id="RolCreate.get_context_data"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolCreate.get_context_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Agregar datos al contexto.</span>
+
+<span class="sd">        :param kwargs:  argumentos clave.</span>
+<span class="sd">        :return: contexto.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RolCreate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;accion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;agregar&#39;</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+<div class="viewcode-block" id="RolCreate.get_success_url"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolCreate.get_success_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :return: La url de redireccion a la vista de los detalles del rol editado.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;rol_detail&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pk&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">id</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="RolCreate.form_valid"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolCreate.form_valid">[docs]</a>    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Comprobar validez del formulario.</span>
+
+<span class="sd">        :param form:formulario recibido.</span>
+<span class="sd">        :return:URL de redireccion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RolCreate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+        <span class="n">choosed_perms</span> <span class="o">=</span> <span class="n">get_selected_perms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">perm_codename</span> <span class="ow">in</span> <span class="n">choosed_perms</span><span class="p">:</span>
+            <span class="n">perm</span> <span class="o">=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">codename</span><span class="o">=</span><span class="n">perm_codename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">perm</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">())</span></div></div>
+
+<span class="n">rol_create</span> <span class="o">=</span> <span class="n">RolCreate</span><span class="o">.</span><span class="n">as_view</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="RolUpdate"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolUpdate">[docs]</a><span class="k">class</span> <span class="nc">RolUpdate</span><span class="p">(</span><span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">GlobalPermissionMixin</span><span class="p">,</span> <span class="n">UpdateView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Vista de actualizacion de Roles.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Group</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;core/rol/rol_form.html&#39;</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">RolForm</span>
+    <span class="n">permission_required</span> <span class="o">=</span> <span class="s1">&#39;auth.change_group&#39;</span>
+
+<div class="viewcode-block" id="RolUpdate.get_context_data"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolUpdate.get_context_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Agregar datos adicionales al contexto.</span>
+
+<span class="sd">        :param kwargs:argumentos clave.</span>
+<span class="sd">        :return:contexto.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RolUpdate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;accion&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;editar&#39;</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+<div class="viewcode-block" id="RolUpdate.get_success_url"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolUpdate.get_success_url">[docs]</a>    <span class="k">def</span> <span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        :return:URL de redireccion correcta a UserDetail.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;rol_detail&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;pk&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">id</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="RolUpdate.get_initial"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolUpdate.get_initial">[docs]</a>    <span class="k">def</span> <span class="nf">get_initial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">         Obtener datos iniciales para el formulario.</span>
+
+<span class="sd">        :return:  diccionario de datos iniciales.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">modelo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+
+        <span class="n">perm_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">perm</span><span class="o">.</span><span class="n">codename</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">modelo</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">all</span><span class="p">())]</span>
+
+        <span class="n">initial</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;perms_proyecto&#39;</span><span class="p">:</span> <span class="n">perm_list</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">initial</span></div>
+
+<div class="viewcode-block" id="RolUpdate.form_valid"><a class="viewcode-back" href="../../../core.views.html#core.views.rol_views.RolUpdate.form_valid">[docs]</a>    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Comprobar validez del formulario.</span>
+
+<span class="sd">        :param form:formulario recibido.</span>
+<span class="sd">        :return:URL de redireccion correcta.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RolUpdate</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span>
+
+        <span class="c1"># eliminamos permisos anteriores.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">choosed_perms</span> <span class="o">=</span> <span class="n">get_selected_perms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">permname</span> <span class="ow">in</span> <span class="n">choosed_perms</span><span class="p">:</span>
+            <span class="n">perm</span> <span class="o">=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">codename</span><span class="o">=</span><span class="n">permname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">perm</span><span class="p">)</span>
+
+        <span class="c1"># actualizamos los permisos de los miembros de equipos que tienen este rol.</span>
+        <span class="n">team_members_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">miembroequipo_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">team_member</span> <span class="ow">in</span> <span class="n">team_members_set</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">team_member</span><span class="o">.</span><span class="n">usuario</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">team_member</span><span class="o">.</span><span class="n">proyecto</span>
+            <span class="c1"># borramos todos los permisos que tiene asociado el usuario en el proyecto.</span>
+            <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">get_perms</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">project</span><span class="p">):</span>
+                <span class="c1"># no eliminar el permiso view_project.</span>
+                <span class="k">if</span> <span class="n">perm</span> <span class="o">!=</span> <span class="s1">&#39;view_project&#39;</span><span class="p">:</span>
+                    <span class="n">remove_perm</span><span class="p">(</span><span class="n">perm</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">project</span><span class="p">)</span>
+
+            <span class="n">all_roles</span> <span class="o">=</span> <span class="n">team_member</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">role</span> <span class="ow">in</span> <span class="n">all_roles</span><span class="p">:</span>
+                <span class="c1"># desacociamos al usuario de los demas roles con los que contaba (para que se eliminen los permisos anteriores).</span>
+                <span class="n">team_member</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+                <span class="c1"># volvemos a agregar para que se copien los permisos actualizados.</span>
+                <span class="n">team_member</span><span class="o">.</span><span class="n">roles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">role</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">())</span></div></div>
+
+<span class="n">rol_update</span> <span class="o">=</span> <span class="n">RolUpdate</span><span class="o">.</span><span class="n">as_view</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Oscar Gimenez, Luis Isasi, Eulalio David Cabrera.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

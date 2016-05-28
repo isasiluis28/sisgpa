@@ -1,6 +1,7 @@
 {% extends 'core/sprint/base.html' %}
 {% load static %}
 {% load bootstrap3 %}
+{% block title %}Formulario Sprints{% endblock %}
 
 {% block breadcrumb %}
     <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
@@ -15,6 +16,7 @@
     <li class="active">{{ current_action | title }}</li>
 {% endblock %}
 
+{% block header %}Sprint{% endblock %}
 {% block inside_extrajs %}
     <script src="{% static 'js/jquery.formset.js' %}"></script>
     <script type="text/javascript">

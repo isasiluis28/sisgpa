@@ -1,22 +1,20 @@
-{% extends 'core/sprint/base.html' %}
+{% extends "core/sprint/base.html" %}
 {% load static %}
 {% load bootstrap3 %}
-{% block title %}Formulario Sprints{% endblock %}
 
 {% block breadcrumb %}
     <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
-    {% if current_action == 'editar' %}
+    {% if current_action == 'Editar' %}
         <li><a href="{{ sprint.proyecto.get_absolute_url }}">{{ sprint.proyecto }}</a></li>
         <li><a href="{% url 'sprint_list' sprint.proyecto_id %}">Sprints</a></li>
         <li><a href="{{ sprint.get_absolute_url }}">{{ sprint }}</a></li>
-    {% elif current_action == 'agregar' %}
-        <li><a href="{{ view.project.get_absolute_url }}">{{ view.project.nombre_corto }}</a></li>
-        <li><a href="{% url 'sprint_list' view.project.id %}">Sprints</a></li>
+    {% elif current_action == 'Agregar' %}
+        <li><a href="{{ view.proyecto.get_absolute_url }}">{{ view.proyecto }}</a></li>
+        <li><a href="{% url 'sprint_list' view.proyecto.id %}">Sprints</a></li>
     {% endif %}
-    <li class="active">{{ current_action | title }}</li>
+    <li class="active">{{ current_action }}</li>
 {% endblock %}
 
-{% block header %}Sprint{% endblock %}
 {% block inside_extrajs %}
     <script src="{% static 'js/jquery.formset.js' %}"></script>
     <script type="text/javascript">
@@ -30,7 +28,7 @@
     </script>
 {% endblock %}
 
-{% block inside_content %}
+{% block inside_content%}
     <style>
         .empty-form {
             display: none;

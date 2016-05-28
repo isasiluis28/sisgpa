@@ -53,7 +53,7 @@
                              {% with p=u.prioridad %}
                                  <a href="{% url 'us_detail' u.id %}" class="btn btn-outline
                                  btn-{% if p == 1 %}primary{% elif p == 2 %}warning{% elif p == 3 %}danger{% endif %}
-                                 btn-sm btn-block">{% if u.estado == 4 %}<li class="fa fa-check-circle fa-adjust"></li>{% elif u.estado == 4 %}<li class="fa fa-times-circle fa-adjust"></li> {% endif %}{{ u.nombre }} ({{ u.tiempo_registrado }}/{{ u.tiempo_estimado }})</a>
+                                 btn-sm btn-block">{% if u.estado == 4 %}<li class="fa fa-check-circle fa-adjust"></li>{% elif u.estado == 5 %}<li class="fa fa-times-circle fa-adjust"></li> {% endif %}{{ u.nombre }} ({{ u.tiempo_registrado }}/{{ u.tiempo_estimado }})</a>
                              {% endwith %}
                          {% endif %}
                          </td>
@@ -62,7 +62,7 @@
                              {% with p=u.prioridad %}
                                  <a href="{% url 'us_detail' u.id %}" class="btn btn-outline
                                  btn-{% if p == 1 %}primary{% elif p == 2 %}warning{% elif p == 3 %}danger{% endif %}
-                                 btn-sm btn-block">{% if u.estado == 4 %}<li class="fa fa-check-circle fa-adjust"></li>{% elif u.estado == 4 %}<li class="fa fa-times-circle fa-adjust"></li> {% endif %}{{ u.nombre }} ({{ u.tiempo_registrado }}/{{ u.tiempo_estimado }})</a>
+                                 btn-sm btn-block">{% if u.estado == 4 %}<li class="fa fa-check-circle fa-adjust"></li>{% elif u.estado == 5 %}<li class="fa fa-times-circle fa-adjust"></li> {% endif %}{{ u.nombre }} ({{ u.tiempo_registrado }}/{{ u.tiempo_estimado }})</a>
                              {% endwith %}
                          {% endif %}
                          </td>
@@ -71,7 +71,7 @@
                              {% with p=u.prioridad %}
                                  <a href="{% url 'us_detail' u.id %}" class="btn btn-outline
                                  btn-{% if p == 1 %}primary{% elif p == 2 %}warning{% elif p == 3 %}danger{% endif %}
-                                 btn-sm btn-block">{% if u.estado == 4 %}<li class="fa fa-check-circle fa-adjust"></li>{% elif u.estado == 4 %}<li class="fa fa-times-circle fa-adjust"></li> {% endif %}{{ u.nombre }} ({{ u.tiempo_registrado }}/{{ u.tiempo_estimado }})</a>
+                                 btn-sm btn-block">{% if u.estado == 4 %}<li class="fa fa-check-circle fa-adjust"></li>{% elif u.estado == 5 %}<li class="fa fa-times-circle fa-adjust"></li> {% endif %}{{ u.nombre }} ({{ u.tiempo_registrado }}/{{ u.tiempo_estimado }})</a>
                              {% endwith %}
                          {% endif %}
                          </td>

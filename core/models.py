@@ -95,11 +95,7 @@ class Proyecto(models.Model):
 
 class MiembroEquipo(models.Model):
     """
-<<<<<<< HEAD
-    Modelo que relaciona los diferentes miembros en un proyecto.
-=======
         Miembros del equipo de un proyecto con un rol específico.
->>>>>>> c3c941c112083f1b2f0ea607b80d47310408e4c7
     """
     proyecto = models.ForeignKey(Proyecto)
     usuario = models.ForeignKey(User)
@@ -269,24 +265,3 @@ from core.signals import add_permissions_team_member
 m2m_changed.connect(add_permissions_team_member, sender=MiembroEquipo.roles.through,
                     dispatch_uid='add_permissions_signal')
 
-
-
-class Nota(models.Model):
-    """
-    Manejo de notas adjuntas relacionadas a un User Story, estás entradas representan
-    constancias de los cambios, como cantidad de horas trabajadas, en un user story.
-    """
-    estado_choices = ((1, 'Inactivo'), (2, 'En curso'), (3, 'Pendiente Aprobacion'), (4, 'Aprobado'), (5,'Cancelado'),)
-    mensaje = models.TextField(help_text='Mensaje de descripcion de los avances o motivo de cancelacion', null=True, blank=True)
-    fecha = models.DateTimeField(default=timezone.now)
-    tiempo_registrado = models.IntegerField(default=0)
-    horas_a_registrar = models.IntegerField(default=0)
-    desarrollador = models.ForeignKey(User, null=True)
-    sprint = models.ForeignKey(Sprint, null=True)
-    actividad = models.ForeignKey(Actividad, null=True)
-    estado = models.IntegerField(choices=estado_choices, default=0)
-    estado_actividad = models.IntegerField(choices=UserStory.ACTIVIDAD_ESTADOS, null=True)
-    user_story = models.ForeignKey(UserStory)
-
-    def __unicode__(self):
-        return '{}({}): {}'.format(self.desarrollador, self.fecha, self.horas_a_registrar)

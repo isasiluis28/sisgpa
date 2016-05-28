@@ -16,7 +16,7 @@ from reversion import revisions as reversion
 from django.utils import timezone
 
 from core.forms import RegistrarActividadForm
-from core.models import UserStory, Proyecto, Actividad, Nota
+from core.models import UserStory, Proyecto, Actividad
 from core.views.views import GlobalPermissionMixin, ActiveProjectRequiredMixin, CreateViewMixin
 
 

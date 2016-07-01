@@ -76,6 +76,10 @@ class SprintDetail(LoginRequiredMixin, GlobalPermissionMixin, DetailView):
     template_name = 'core/sprint/sprint_detail.html'
     context_object_name = 'sprint'
 
+    # def __init__(self):
+    #     super(SprintDetail, self).__init__()
+    #
+
     def get_permission_object(self):
         """
         Obtener el permiso de un objeto.
@@ -91,6 +95,16 @@ class SprintDetail(LoginRequiredMixin, GlobalPermissionMixin, DetailView):
         :param kwargs:argumentos clave.
         :return:  retorna el contexto.
         """
+
+        sprint_obj = self.get_object()
+        if (sprint_obj.fecha_fin + datetime.timedelta(days=1)) == datetime.datetime.now():
+            us_list = sprint_obj.userstory_set.all()
+            for us in us_list:
+                flujo = us.actividad.flujo
+                if us.estado_actividad != 3 or flujo.actividad_set.last() != us.actividad:
+                    us.prioridad = 3
+                    us.sprint = None
+
         context = super(SprintDetail, self).get_context_data(**kwargs)
         context['userstory_list'] = self.object.userstory_set.order_by('-prioridad')
         return context

@@ -12,9 +12,10 @@
 
 {% block header %}{{ sprint.nombre | title }} {% endblock %}
 {% block inside_content %}
+    <div id="disableDisplay">
     <ul class="list-inline">
         {% get_obj_perms user for sprint.proyecto as "proyecto_perms" %}
-        {% if "edit_sprint" in proyecto_perms %}
+        {% if "edit_sprint" in proyecto_perms%}
             <li><a href="#" class="fa fa-pencil"> Edit</a></li>
         {% endif %}
 {#        <li><a href="{% url 'project:sprint_burndown'  sprint.id %}" class="fa fa-line-chart"> Ver Burndown</a></li>#}
@@ -66,6 +67,7 @@
                 </div>
             </div>
         {% endfor %}
+    </div>
     </div>
     <div class="col-lg-12">
     <p><a class="fa fa-file" href="{% url 'project_detail' sprint.proyecto.id %}"> Volver al Proyecto {{ sprint.proyecto.nombre_corto }}</a></p>

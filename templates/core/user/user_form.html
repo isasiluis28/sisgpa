@@ -6,7 +6,11 @@
     {% if current_action == 'editar' %}
         <li><a href="{% url 'user_detail' object.id %}">{{ object.get_full_name }}</a></li>
     {% endif %}
-    <li class="active">{{ current_action }}</li>
+
+     <li class="active">{{ current_action }}</li>
+    <div class="col-lg-15">
+				<h1 class="page-header">Creacion de Usuarios</h1>
+        </div>
 {% endblock %}
 
 {% block inside_content %}

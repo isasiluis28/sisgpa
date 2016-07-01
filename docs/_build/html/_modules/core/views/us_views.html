@@ -41,20 +41,24 @@
             
   <h1>Source code for core.views.us_views</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">PermissionDenied</span>
+
+<span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">PermissionDenied</span><span class="p">,</span> <span class="n">ObjectDoesNotExist</span>
 <span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span><span class="p">,</span> <span class="n">reverse_lazy</span>
 <span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">transaction</span>
-<span class="kn">from</span> <span class="nn">django.forms.models</span> <span class="kn">import</span> <span class="n">modelform_factory</span>
+<span class="kn">from</span> <span class="nn">django.forms.models</span> <span class="kn">import</span> <span class="n">modelform_factory</span><span class="p">,</span> <span class="n">modelformset_factory</span>
 <span class="kn">from</span> <span class="nn">django.http.response</span> <span class="kn">import</span> <span class="n">HttpResponseRedirect</span>
-<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">render</span>
+<span class="kn">from</span> <span class="nn">django.views</span> <span class="kn">import</span> <span class="n">generic</span>
 <span class="kn">from</span> <span class="nn">django.views.generic.detail</span> <span class="kn">import</span> <span class="n">DetailView</span>
 <span class="kn">from</span> <span class="nn">django.views.generic.edit</span> <span class="kn">import</span> <span class="n">CreateView</span><span class="p">,</span> <span class="n">UpdateView</span><span class="p">,</span> <span class="n">DeleteView</span>
 <span class="kn">from</span> <span class="nn">django.views.generic.list</span> <span class="kn">import</span> <span class="n">ListView</span>
 <span class="kn">from</span> <span class="nn">guardian.mixins</span> <span class="kn">import</span> <span class="n">LoginRequiredMixin</span>
 <span class="kn">from</span> <span class="nn">guardian.shortcuts</span> <span class="kn">import</span> <span class="n">get_perms</span>
 <span class="kn">from</span> <span class="nn">reversion</span> <span class="kn">import</span> <span class="n">revisions</span> <span class="k">as</span> <span class="n">reversion</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">timezone</span>
 
-<span class="kn">from</span> <span class="nn">core.models</span> <span class="kn">import</span> <span class="n">UserStory</span><span class="p">,</span> <span class="n">Proyecto</span>
+<span class="kn">from</span> <span class="nn">core.forms</span> <span class="kn">import</span> <span class="n">RegistrarActividadForm</span>
+<span class="kn">from</span> <span class="nn">core.models</span> <span class="kn">import</span> <span class="n">UserStory</span><span class="p">,</span> <span class="n">Proyecto</span><span class="p">,</span> <span class="n">Actividad</span>
 <span class="kn">from</span> <span class="nn">core.views.views</span> <span class="kn">import</span> <span class="n">GlobalPermissionMixin</span><span class="p">,</span> <span class="n">ActiveProjectRequiredMixin</span><span class="p">,</span> <span class="n">CreateViewMixin</span>
 
 
@@ -258,6 +262,117 @@
 
 
 <span class="n">delete_us</span> <span class="o">=</span> <span class="n">DeleteUserStory</span><span class="o">.</span><span class="n">as_view</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="RegistrarActividadUserStory"><a class="viewcode-back" href="../../../core.views.html#core.views.us_views.RegistrarActividadUserStory">[docs]</a><span class="k">class</span> <span class="nc">RegistrarActividadUserStory</span><span class="p">(</span><span class="n">ActiveProjectRequiredMixin</span><span class="p">,</span> <span class="n">LoginRequiredMixin</span><span class="p">,</span> <span class="n">generic</span><span class="o">.</span><span class="n">UpdateView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    View que permite registrar los cambios aplicados a un user story</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">UserStory</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;core/us/us_regactivity_form.html&#39;</span>
+    <span class="n">error_template</span> <span class="o">=</span> <span class="s1">&#39;core/us/us_error.html&#39;</span>
+
+
+
+<div class="viewcode-block" id="RegistrarActividadUserStory.get_proyecto"><a class="viewcode-back" href="../../../core.views.html#core.views.us_views.RegistrarActividadUserStory.get_proyecto">[docs]</a>    <span class="k">def</span> <span class="nf">get_proyecto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span><span class="o">.</span><span class="n">proyecto</span></div>
+
+<div class="viewcode-block" id="RegistrarActividadUserStory.get_context_data"><a class="viewcode-back" href="../../../core.views.html#core.views.us_views.RegistrarActividadUserStory.get_context_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RegistrarActividadUserStory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+    <span class="c1"># def dispatch(self, request, *args, **kwargs):</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     Comprobación de permisos hecha antes de la llamada al dispatch que inicia el proceso de respuesta al request de la url</span>
+    <span class="c1">#     :param request: request hecho por el cliente</span>
+    <span class="c1">#     :param args: argumentos adicionales posicionales</span>
+    <span class="c1">#     :param kwargs: argumentos adicionales en forma de diccionario</span>
+    <span class="c1">#     :return: PermissionDenied si el usuario no cuenta con permisos</span>
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     if &#39;regactivity_us&#39; in get_perms(request.user, self.get_object().proyecto) \</span>
+    <span class="c1">#             or (&#39;register_my_us&#39; in get_perms(request.user, self.get_object())): #Comprobacion de permisos</span>
+    <span class="c1">#         if self.get_object().sprint and self.get_object().sprint.inicio.date() &lt;= timezone.now().date() and self.get_object().sprint.fin.date() &gt;= timezone.now().date():</span>
+    <span class="c1">#             if self.get_object().actividad:</span>
+    <span class="c1">#                 current_priority = self.get_object().prioridad</span>
+    <span class="c1">#                 s = self.get_object().sprint</span>
+    <span class="c1">#                 a = self.get_object().actividad</span>
+    <span class="c1">#                 d = self.get_object().desarrollador</span>
+    <span class="c1">#                 bigger_priorities = UserStory.objects.filter(sprint=s, actividad=a, desarrollador=d, prioridad__gt=current_priority).count()</span>
+    <span class="c1">#                 if bigger_priorities == 1: #Comprobacion de prioridad del User Story</span>
+    <span class="c1">#                     if self.get_object().estado == 2: #Comprobacion de estado del User Story</span>
+    <span class="c1">#                         return super(RegistrarActividadUserStory, self).dispatch(request, *args, **kwargs)</span>
+    <span class="c1">#                     return render(request, self.error_template, {&#39;userstory&#39;: self.get_object(), &#39;error&#39;: &quot;OTRO_ESTADO&quot;})</span>
+    <span class="c1">#             return render(request, self.error_template, {&#39;userstory&#39;: self.get_object(), &#39;error&#39;: &quot;MENOR_PRIORIDAD&quot;})</span>
+    <span class="c1">#         return render(request, self.error_template, {&#39;userstory&#39;: self.get_object(), &#39;error&#39;: &quot;SPRINT_VENCIDO&quot;})</span>
+    <span class="c1">#     raise PermissionDenied()</span>
+
+<div class="viewcode-block" id="RegistrarActividadUserStory.get_form_class"><a class="viewcode-back" href="../../../core.views.html#core.views.us_views.RegistrarActividadUserStory.get_form_class">[docs]</a>    <span class="k">def</span> <span class="nf">get_form_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retorna el tipo de formulario que se mostrará en el template. En caso de que</span>
+<span class="sd">        el usuario cuente con el permiso de editar userstory se le permitirá cambiar la actividad</span>
+<span class="sd">        del User Story.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">actual_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;estado_actividad&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;edit_us&#39;</span> <span class="ow">in</span> <span class="n">get_perms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span><span class="o">.</span><span class="n">proyecto</span><span class="p">)</span> <span class="ow">or</span> \
+                        <span class="s1">&#39;edit_my_us&#39;</span> <span class="ow">in</span> <span class="n">get_perms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()):</span>
+            <span class="n">actual_fields</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;actividad&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">modelform_factory</span><span class="p">(</span><span class="n">UserStory</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">RegistrarActividadForm</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="n">actual_fields</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RegistrarActividadUserStory.get_form"><a class="viewcode-back" href="../../../core.views.html#core.views.us_views.RegistrarActividadUserStory.get_form">[docs]</a>    <span class="k">def</span> <span class="nf">get_form</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form_class</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Personalización del form retornado</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RegistrarActividadUserStory</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_form</span><span class="p">(</span><span class="n">form_class</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;actividad&#39;</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;actividad&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">Actividad</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">flujo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span><span class="o">.</span><span class="n">actividad</span><span class="o">.</span><span class="n">flujo</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">form</span></div>
+
+<div class="viewcode-block" id="RegistrarActividadUserStory.form_valid"><a class="viewcode-back" href="../../../core.views.html#core.views.us_views.RegistrarActividadUserStory.form_valid">[docs]</a>    <span class="k">def</span> <span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">commit</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">tiempo_registrado</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">tiempo_registrado</span> <span class="o">+</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;horas_a_registrar&#39;</span><span class="p">]</span>
+        <span class="c1">#nota_form = self.NoteFormset(self.request.POST)</span>
+        <span class="n">new_estado</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1">#movemos el User Story a la sgte actividad en caso de que haya llegado a Done</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;estado_actividad&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">new_estado</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">next_actividad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">actividad</span><span class="o">.</span><span class="n">get_next_in_order</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">ObjectDoesNotExist</span><span class="p">:</span>
+                <span class="n">next_actividad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">actividad</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1">#Lo marcamos como pendiente de aprobación</span>
+                <span class="n">new_estado</span> <span class="o">=</span> <span class="mi">3</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">actividad</span> <span class="o">=</span> <span class="n">next_actividad</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">estado_actividad</span> <span class="o">=</span> <span class="n">new_estado</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">object</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c1"># if nota_form.is_valid():</span>
+        <span class="c1">#     for f in nota_form.forms:</span>
+        <span class="c1">#         n = f.save(commit=False)</span>
+        <span class="c1">#         n.horas_a_registrar = form.cleaned_data[&#39;horas_a_registrar&#39;]</span>
+        <span class="c1">#         n.tiempo_registrado = self.object.tiempo_registrado</span>
+        <span class="c1">#         n.desarrollador = self.request.user</span>
+        <span class="c1">#         n.sprint = self.object.sprint</span>
+        <span class="c1">#         n.actividad = self.object.actividad</span>
+        <span class="c1">#         n.estado = self.object.estado</span>
+        <span class="c1">#         n.estado_actividad = self.object.estado_actividad</span>
+        <span class="c1">#         n.user_story = self.object</span>
+        <span class="c1">#         n.save()</span>
+        <span class="c1">#     #self.notify(n)</span>
+
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">())</span></div></div>
+
+
+
+
+
+
+
+
+
+
 </pre></div>
 
           </div>

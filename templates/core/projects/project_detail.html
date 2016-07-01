@@ -11,9 +11,9 @@
     <h1>{{ project.nombre_largo }}</h1>
 
     <ul class="list-inline">
-        <li><a href="{% url 'project_update' project.id %}" class="fa fa-pencil"> Editar</a></li>
-        <li><a href="{% url 'project_delete' project.id %}" class="fa fa-eraser"> Cancelar</a></li>
-        <a href="{% url 'us_list' project.id %}"><i class="fa fa-file fa-fw"></i> Ver Product Backlog</a>
+        <li><a href="{% url 'project_update' project.id %}" class="fa fa-pencil"> Editar </a></li>
+        <li><a href="{% url 'project_delete' project.id %}" class="fa fa-eraser"> Cancelar </a></li>
+        <a href="{% url 'us_list' project.id %}"><i class="fa fa-file fa-fw"></i> Ver Product Backlog </a>
 {#        <a href="/projects/12/userstories/pending/"><i class="fa fa-check-square fa-fw"></i> User Stories a Aprobar <span class="badge">0</span></a>#}
 
 
@@ -40,6 +40,7 @@
                         <p>{{ project.descripcion }}</p>
                     </div>
                     <div class="tab-pane fade" id="tab3">
+
                         <h4>mas...</h4>
                         <p><strong>user stories:</strong></p>
                         <p><strong>user stories(en desarrollo):</strong> 0</p>

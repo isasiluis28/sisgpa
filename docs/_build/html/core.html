@@ -180,14 +180,15 @@
 <dt id="core.forms.AddToSprintForm">
 <em class="property">class </em><code class="descclassname">core.forms.</code><code class="descname">AddToSprintForm</code><span class="sig-paren">(</span><em>data=None</em>, <em>files=None</em>, <em>auto_id=u'id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em>label_suffix=None</em>, <em>empty_permitted=False</em>, <em>field_order=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/forms.html#AddToSprintForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.AddToSprintForm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.forms.forms.Form</span></code></p>
+<p>formulario para la agregacion de userStory, desarrollador y flujo a un Sprint</p>
 <dl class="attribute">
 <dt id="core.forms.AddToSprintForm.base_fields">
-<code class="descname">base_fields</code><em class="property"> = OrderedDict([('userstory', &lt;django.forms.models.ModelChoiceField object at 0x2ba82db4ced0&gt;), ('desarrollador', &lt;django.forms.models.ModelChoiceField object at 0x2ba82db4e090&gt;), ('flujo', &lt;django.forms.models.ModelChoiceField object at 0x2ba82db4e210&gt;)])</em><a class="headerlink" href="#core.forms.AddToSprintForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descname">base_fields</code><em class="property"> = OrderedDict([('userstory', &lt;django.forms.models.ModelChoiceField object at 0x2b4d082b9e50&gt;), ('desarrollador', &lt;django.forms.models.ModelChoiceField object at 0x2b4d082b9f90&gt;), ('flujo', &lt;django.forms.models.ModelChoiceField object at 0x2b4d082bb090&gt;)])</em><a class="headerlink" href="#core.forms.AddToSprintForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="core.forms.AddToSprintForm.declared_fields">
-<code class="descname">declared_fields</code><em class="property"> = OrderedDict([('userstory', &lt;django.forms.models.ModelChoiceField object at 0x2ba82db4ced0&gt;), ('desarrollador', &lt;django.forms.models.ModelChoiceField object at 0x2ba82db4e090&gt;), ('flujo', &lt;django.forms.models.ModelChoiceField object at 0x2ba82db4e210&gt;)])</em><a class="headerlink" href="#core.forms.AddToSprintForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descname">declared_fields</code><em class="property"> = OrderedDict([('userstory', &lt;django.forms.models.ModelChoiceField object at 0x2b4d082b9e50&gt;), ('desarrollador', &lt;django.forms.models.ModelChoiceField object at 0x2b4d082b9f90&gt;), ('flujo', &lt;django.forms.models.ModelChoiceField object at 0x2b4d082bb090&gt;)])</em><a class="headerlink" href="#core.forms.AddToSprintForm.declared_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -198,13 +199,14 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="core.forms.AddToSprintFormSet">
-<em class="property">class </em><code class="descclassname">core.forms.</code><code class="descname">AddToSprintFormSet</code><span class="sig-paren">(</span><em>data=None</em>, <em>files=None</em>, <em>auto_id=u'id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em>form_kwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/forms.html#AddToSprintFormSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.AddToSprintFormSet" title="Permalink to this definition">¶</a></dt>
+<dt id="core.forms.AddToSprintFormset">
+<em class="property">class </em><code class="descclassname">core.forms.</code><code class="descname">AddToSprintFormset</code><span class="sig-paren">(</span><em>data=None</em>, <em>files=None</em>, <em>auto_id=u'id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em>form_kwargs=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/forms.html#AddToSprintFormset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.AddToSprintFormset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.forms.formsets.BaseFormSet</span></code></p>
 <dl class="method">
-<dt id="core.forms.AddToSprintFormSet.clean">
-<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/forms.html#AddToSprintFormSet.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.AddToSprintFormSet.clean" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="core.forms.AddToSprintFormset.clean">
+<code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/forms.html#AddToSprintFormset.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.AddToSprintFormset.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Chequea que no se incluye el mismo user story más de una vez en el sprint</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -231,7 +233,7 @@
 
 <dl class="attribute">
 <dt id="core.forms.FlujoCreateForm.base_fields">
-<code class="descclassname">FlujoCreateForm.</code><code class="descname">base_fields</code><em class="property"> = OrderedDict([('nombre', &lt;django.forms.fields.CharField object at 0x2ba82db4cc90&gt;)])</em><a class="headerlink" href="#core.forms.FlujoCreateForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">FlujoCreateForm.</code><code class="descname">base_fields</code><em class="property"> = OrderedDict([('nombre', &lt;django.forms.fields.CharField object at 0x2b4d082b9890&gt;)])</em><a class="headerlink" href="#core.forms.FlujoCreateForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -242,6 +244,43 @@
 <dl class="attribute">
 <dt id="core.forms.FlujoCreateForm.media">
 <code class="descclassname">FlujoCreateForm.</code><code class="descname">media</code><a class="headerlink" href="#core.forms.FlujoCreateForm.media" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="core.forms.RegistrarActividadForm">
+<em class="property">class </em><code class="descclassname">core.forms.</code><code class="descname">RegistrarActividadForm</code><span class="sig-paren">(</span><em>data=None</em>, <em>files=None</em>, <em>auto_id=u'id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em>label_suffix=None</em>, <em>empty_permitted=False</em>, <em>instance=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/forms.html#RegistrarActividadForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.RegistrarActividadForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.forms.models.ModelForm</span></code></p>
+<dl class="class">
+<dt id="core.forms.RegistrarActividadForm.Meta">
+<em class="property">class </em><code class="descname">Meta</code><a class="reference internal" href="_modules/core/forms.html#RegistrarActividadForm.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.RegistrarActividadForm.Meta" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="core.forms.RegistrarActividadForm.Meta.fields">
+<code class="descname">fields</code><em class="property"> = ['estado_actividad']</em><a class="headerlink" href="#core.forms.RegistrarActividadForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="core.forms.RegistrarActividadForm.Meta.model">
+<code class="descname">model</code><a class="headerlink" href="#core.forms.RegistrarActividadForm.Meta.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">UserStory</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.forms.RegistrarActividadForm.base_fields">
+<code class="descclassname">RegistrarActividadForm.</code><code class="descname">base_fields</code><em class="property"> = OrderedDict([('estado_actividad', &lt;django.forms.fields.TypedChoiceField object at 0x2b4d082bb250&gt;), ('horas_a_registrar', &lt;django.forms.fields.IntegerField object at 0x2b4d082bb150&gt;)])</em><a class="headerlink" href="#core.forms.RegistrarActividadForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="core.forms.RegistrarActividadForm.declared_fields">
+<code class="descclassname">RegistrarActividadForm.</code><code class="descname">declared_fields</code><em class="property"> = OrderedDict([('horas_a_registrar', &lt;django.forms.fields.IntegerField object at 0x2b4d082bb150&gt;)])</em><a class="headerlink" href="#core.forms.RegistrarActividadForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="core.forms.RegistrarActividadForm.media">
+<code class="descclassname">RegistrarActividadForm.</code><code class="descname">media</code><a class="headerlink" href="#core.forms.RegistrarActividadForm.media" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -269,12 +308,12 @@
 
 <dl class="attribute">
 <dt id="core.forms.RolForm.base_fields">
-<code class="descclassname">RolForm.</code><code class="descname">base_fields</code><em class="property"> = OrderedDict([('name', &lt;django.forms.fields.CharField object at 0x2ba82db4c950&gt;), ('perms_proyecto', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db42f50&gt;), ('perms_us', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db39ed0&gt;), ('perms_flujo', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db48850&gt;), ('perms_sprint', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db484d0&gt;)])</em><a class="headerlink" href="#core.forms.RolForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RolForm.</code><code class="descname">base_fields</code><em class="property"> = OrderedDict([('name', &lt;django.forms.fields.CharField object at 0x2b4d082b97d0&gt;), ('perms_proyecto', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d082a48d0&gt;), ('perms_us', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d082b3d90&gt;), ('perms_flujo', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d082b3e10&gt;), ('perms_sprint', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d082abc90&gt;)])</em><a class="headerlink" href="#core.forms.RolForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="core.forms.RolForm.declared_fields">
-<code class="descclassname">RolForm.</code><code class="descname">declared_fields</code><em class="property"> = OrderedDict([('perms_proyecto', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db42f50&gt;), ('perms_us', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db39ed0&gt;), ('perms_flujo', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db48850&gt;), ('perms_sprint', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db484d0&gt;)])</em><a class="headerlink" href="#core.forms.RolForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">RolForm.</code><code class="descname">declared_fields</code><em class="property"> = OrderedDict([('perms_proyecto', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d082a48d0&gt;), ('perms_us', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d082b3d90&gt;), ('perms_flujo', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d082b3e10&gt;), ('perms_sprint', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d082abc90&gt;)])</em><a class="headerlink" href="#core.forms.RolForm.declared_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -313,13 +352,13 @@
 <dt id="core.forms.SprintCreateBaseForm">
 <em class="property">class </em><code class="descclassname">core.forms.</code><code class="descname">SprintCreateBaseForm</code><span class="sig-paren">(</span><em>data=None</em>, <em>files=None</em>, <em>auto_id=u'id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.utils.ErrorList'&gt;</em>, <em>label_suffix=None</em>, <em>empty_permitted=False</em>, <em>instance=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/forms.html#SprintCreateBaseForm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.SprintCreateBaseForm" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.forms.models.ModelForm</span></code></p>
-<p>Formulario para la creacion de sprint.</p>
+<p>Formulario base para la creacion de Sprints</p>
 <dl class="class">
 <dt id="core.forms.SprintCreateBaseForm.Meta">
 <em class="property">class </em><code class="descname">Meta</code><a class="reference internal" href="_modules/core/forms.html#SprintCreateBaseForm.Meta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.SprintCreateBaseForm.Meta" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
 <dt id="core.forms.SprintCreateBaseForm.Meta.fields">
-<code class="descname">fields</code><em class="property"> = ('nombre', 'fecha_inicio', 'fecha_fin')</em><a class="headerlink" href="#core.forms.SprintCreateBaseForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
+<code class="descname">fields</code><em class="property"> = ['nombre', 'fecha_inicio', 'proyecto']</em><a class="headerlink" href="#core.forms.SprintCreateBaseForm.Meta.fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -332,13 +371,13 @@
 
 <dl class="attribute">
 <dt id="core.forms.SprintCreateBaseForm.base_fields">
-<code class="descclassname">SprintCreateBaseForm.</code><code class="descname">base_fields</code><em class="property"> = OrderedDict([('nombre', &lt;django.forms.fields.CharField object at 0x2ba82db4c410&gt;), ('fecha_inicio', &lt;django.forms.fields.DateField object at 0x2ba82db4cf90&gt;), ('fecha_fin', &lt;django.forms.fields.DateField object at 0x2ba82db4c450&gt;)])</em><a class="headerlink" href="#core.forms.SprintCreateBaseForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">SprintCreateBaseForm.</code><code class="descname">base_fields</code><em class="property"> = OrderedDict([('nombre', &lt;django.forms.fields.CharField object at 0x2b4d082b9cd0&gt;), ('fecha_inicio', &lt;django.forms.fields.DateField object at 0x2b4d082b9d90&gt;), ('proyecto', &lt;django.forms.models.ModelChoiceField object at 0x2b4d082b9b50&gt;)])</em><a class="headerlink" href="#core.forms.SprintCreateBaseForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="core.forms.SprintCreateBaseForm.clean">
 <code class="descclassname">SprintCreateBaseForm.</code><code class="descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/forms.html#SprintCreateBaseForm.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.forms.SprintCreateBaseForm.clean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Se chequea que las fechas de los sprint no se solapen.</p>
+<dd><p>Chequea que  las fechas  de los Sprints no se solapen</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -376,12 +415,12 @@
 
 <dl class="attribute">
 <dt id="core.forms.UserCreateForm.base_fields">
-<code class="descclassname">UserCreateForm.</code><code class="descname">base_fields</code><em class="property"> = OrderedDict([('first_name', &lt;django.forms.fields.CharField object at 0x2ba82dafb1d0&gt;), ('last_name', &lt;django.forms.fields.CharField object at 0x2ba82dafb310&gt;), ('email', &lt;django.forms.fields.EmailField object at 0x2ba82dafb7d0&gt;), ('username', &lt;django.forms.fields.CharField object at 0x2ba82dafb910&gt;), ('password1', &lt;django.forms.fields.CharField object at 0x2ba82d47df10&gt;), ('password2', &lt;django.forms.fields.CharField object at 0x2ba82d48a190&gt;), ('general_perms', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db25dd0&gt;)])</em><a class="headerlink" href="#core.forms.UserCreateForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">UserCreateForm.</code><code class="descname">base_fields</code><em class="property"> = OrderedDict([('first_name', &lt;django.forms.fields.CharField object at 0x2b4d07a49190&gt;), ('last_name', &lt;django.forms.fields.CharField object at 0x2b4d07a49250&gt;), ('email', &lt;django.forms.fields.EmailField object at 0x2b4d07a492d0&gt;), ('username', &lt;django.forms.fields.CharField object at 0x2b4d07a496d0&gt;), ('password1', &lt;django.forms.fields.CharField object at 0x2b4d073f4110&gt;), ('password2', &lt;django.forms.fields.CharField object at 0x2b4d073f4350&gt;), ('general_perms', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d07a55e10&gt;)])</em><a class="headerlink" href="#core.forms.UserCreateForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="core.forms.UserCreateForm.declared_fields">
-<code class="descclassname">UserCreateForm.</code><code class="descname">declared_fields</code><em class="property"> = OrderedDict([('password1', &lt;django.forms.fields.CharField object at 0x2ba82d47df10&gt;), ('password2', &lt;django.forms.fields.CharField object at 0x2ba82d48a190&gt;), ('first_name', &lt;django.forms.fields.CharField object at 0x2ba82dafb1d0&gt;), ('last_name', &lt;django.forms.fields.CharField object at 0x2ba82dafb310&gt;), ('email', &lt;django.forms.fields.EmailField object at 0x2ba82dafb7d0&gt;), ('general_perms', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82db25dd0&gt;)])</em><a class="headerlink" href="#core.forms.UserCreateForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">UserCreateForm.</code><code class="descname">declared_fields</code><em class="property"> = OrderedDict([('password1', &lt;django.forms.fields.CharField object at 0x2b4d073f4110&gt;), ('password2', &lt;django.forms.fields.CharField object at 0x2b4d073f4350&gt;), ('first_name', &lt;django.forms.fields.CharField object at 0x2b4d07a49190&gt;), ('last_name', &lt;django.forms.fields.CharField object at 0x2b4d07a49250&gt;), ('email', &lt;django.forms.fields.EmailField object at 0x2b4d07a492d0&gt;), ('general_perms', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d07a55e10&gt;)])</em><a class="headerlink" href="#core.forms.UserCreateForm.declared_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -407,12 +446,12 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.contrib.auth.forms.UserChangeForm</span></code></p>
 <dl class="attribute">
 <dt id="core.forms.UserEditForm.base_fields">
-<code class="descname">base_fields</code><em class="property"> = OrderedDict([('password', &lt;django.contrib.auth.forms.ReadOnlyPasswordHashField object at 0x2ba82d48a610&gt;), ('last_login', &lt;django.forms.fields.DateTimeField object at 0x2ba82db42610&gt;), ('is_superuser', &lt;django.forms.fields.BooleanField object at 0x2ba82db42590&gt;), ('groups', &lt;django.forms.models.ModelMultipleChoiceField object at 0x2ba82db421d0&gt;), ('user_permissions', &lt;django.forms.models.ModelMultipleChoiceField object at 0x2ba82db42710&gt;), ('username', &lt;django.forms.fields.CharField object at 0x2ba82db428d0&gt;), ('first_name', &lt;django.forms.fields.CharField object at 0x2ba82db429d0&gt;), ('last_name', &lt;django.forms.fields.CharField object at 0x2ba82db42ad0&gt;), ('email', &lt;django.forms.fields.EmailField object at 0x2ba82db42bd0&gt;), ('is_staff', &lt;django.forms.fields.BooleanField object at 0x2ba82db42cd0&gt;), ('is_active', &lt;django.forms.fields.BooleanField object at 0x2ba82db42d90&gt;), ('date_joined', &lt;django.forms.fields.DateTimeField object at 0x2ba82db42e50&gt;), ('general_perms', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82dafb9d0&gt;)])</em><a class="headerlink" href="#core.forms.UserEditForm.base_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descname">base_fields</code><em class="property"> = OrderedDict([('password', &lt;django.contrib.auth.forms.ReadOnlyPasswordHashField object at 0x2b4d073f47d0&gt;), ('last_login', &lt;django.forms.fields.DateTimeField object at 0x2b4d082a4310&gt;), ('is_superuser', &lt;django.forms.fields.BooleanField object at 0x2b4d082a4c90&gt;), ('groups', &lt;django.forms.models.ModelMultipleChoiceField object at 0x2b4d082ab210&gt;), ('user_permissions', &lt;django.forms.models.ModelMultipleChoiceField object at 0x2b4d082ab410&gt;), ('username', &lt;django.forms.fields.CharField object at 0x2b4d082ab5d0&gt;), ('first_name', &lt;django.forms.fields.CharField object at 0x2b4d082ab6d0&gt;), ('last_name', &lt;django.forms.fields.CharField object at 0x2b4d082ab7d0&gt;), ('email', &lt;django.forms.fields.EmailField object at 0x2b4d082ab8d0&gt;), ('is_staff', &lt;django.forms.fields.BooleanField object at 0x2b4d082ab9d0&gt;), ('is_active', &lt;django.forms.fields.BooleanField object at 0x2b4d082aba90&gt;), ('date_joined', &lt;django.forms.fields.DateTimeField object at 0x2b4d082abb50&gt;), ('general_perms', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d07a49550&gt;)])</em><a class="headerlink" href="#core.forms.UserEditForm.base_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="core.forms.UserEditForm.declared_fields">
-<code class="descname">declared_fields</code><em class="property"> = OrderedDict([('password', &lt;django.contrib.auth.forms.ReadOnlyPasswordHashField object at 0x2ba82d48a610&gt;), ('general_perms', &lt;django.forms.fields.MultipleChoiceField object at 0x2ba82dafb9d0&gt;)])</em><a class="headerlink" href="#core.forms.UserEditForm.declared_fields" title="Permalink to this definition">¶</a></dt>
+<code class="descname">declared_fields</code><em class="property"> = OrderedDict([('password', &lt;django.contrib.auth.forms.ReadOnlyPasswordHashField object at 0x2b4d073f47d0&gt;), ('general_perms', &lt;django.forms.fields.MultipleChoiceField object at 0x2b4d07a49550&gt;)])</em><a class="headerlink" href="#core.forms.UserEditForm.declared_fields" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -439,7 +478,7 @@
 <dt id="core.models.Actividad">
 <em class="property">class </em><code class="descclassname">core.models.</code><code class="descname">Actividad</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/models.html#Actividad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.models.Actividad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></code></p>
-<p>las actividades representan las distintas etapas de las que se compone un flujo.</p>
+<p>Las actividades representan las distintas etapas de las que se compone un flujo.</p>
 <dl class="exception">
 <dt id="core.models.Actividad.DoesNotExist">
 <em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#core.models.Actividad.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -464,6 +503,16 @@ one-to-one relation.</p>
 </div>
 <p><code class="docutils literal"><span class="pre">child.parent</span></code> is a <code class="docutils literal"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="core.models.Actividad.get_next_in_order">
+<code class="descclassname">Actividad.</code><code class="descname">get_next_in_order</code><span class="sig-paren">(</span><em>*moreargs</em>, <em>**morekwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#core.models.Actividad.get_next_in_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.models.Actividad.get_previous_in_order">
+<code class="descclassname">Actividad.</code><code class="descname">get_previous_in_order</code><span class="sig-paren">(</span><em>*moreargs</em>, <em>**morekwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#core.models.Actividad.get_previous_in_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="core.models.Actividad.objects">
@@ -519,6 +568,11 @@ many-to-one relation.</p>
 class built by <code class="docutils literal"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="core.models.Flujo.get_actividad_order">
+<code class="descclassname">Flujo.</code><code class="descname">get_actividad_order</code><span class="sig-paren">(</span><em>*moreargs</em>, <em>**morekwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#core.models.Flujo.get_actividad_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="core.models.Flujo.objects">
 <code class="descclassname">Flujo.</code><code class="descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#core.models.Flujo.objects" title="Permalink to this definition">¶</a></dt>
@@ -536,6 +590,11 @@ one-to-one relation.</p>
 </div>
 <p><code class="docutils literal"><span class="pre">child.parent</span></code> is a <code class="docutils literal"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="core.models.Flujo.set_actividad_order">
+<code class="descclassname">Flujo.</code><code class="descname">set_actividad_order</code><span class="sig-paren">(</span><em>*moreargs</em>, <em>**morekwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#core.models.Flujo.set_actividad_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -619,7 +678,7 @@ one-to-one relation.</p>
 <dt id="core.models.Proyecto">
 <em class="property">class </em><code class="descclassname">core.models.</code><code class="descname">Proyecto</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/models.html#Proyecto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.models.Proyecto" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></code></p>
-<p>Modelo del proyecto del sistema.</p>
+<p>Modelo de Proyecto del sistema</p>
 <dl class="exception">
 <dt id="core.models.Proyecto.DoesNotExist">
 <em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#core.models.Proyecto.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -684,6 +743,16 @@ class built by <code class="docutils literal"><span class="pre">create_forward_m
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="core.models.Proyecto.get_horas_estimadas">
+<code class="descclassname">Proyecto.</code><code class="descname">get_horas_estimadas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/models.html#Proyecto.get_horas_estimadas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.models.Proyecto.get_horas_estimadas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.models.Proyecto.get_horas_trabajadas">
+<code class="descclassname">Proyecto.</code><code class="descname">get_horas_trabajadas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/models.html#Proyecto.get_horas_trabajadas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.models.Proyecto.get_horas_trabajadas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="core.models.Proyecto.get_next_by_fecha_creacion">
 <code class="descclassname">Proyecto.</code><code class="descname">get_next_by_fecha_creacion</code><span class="sig-paren">(</span><em>*moreargs</em>, <em>**morekwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#core.models.Proyecto.get_next_by_fecha_creacion" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -734,6 +803,11 @@ class built by <code class="docutils literal"><span class="pre">create_forward_m
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="core.models.Proyecto.progreso">
+<code class="descclassname">Proyecto.</code><code class="descname">progreso</code><a class="headerlink" href="#core.models.Proyecto.progreso" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="core.models.Proyecto.sprint_set">
 <code class="descclassname">Proyecto.</code><code class="descname">sprint_set</code><a class="headerlink" href="#core.models.Proyecto.sprint_set" title="Permalink to this definition">¶</a></dt>
 <dd><p>Accessor to the related objects manager on the reverse side of a
@@ -769,7 +843,7 @@ class built by <code class="docutils literal"><span class="pre">create_forward_m
 <dt id="core.models.Sprint">
 <em class="property">class </em><code class="descclassname">core.models.</code><code class="descname">Sprint</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/models.html#Sprint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.models.Sprint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">django.db.models.base.Model</span></code></p>
-<p>Manejo de los sprints del proyecto.</p>
+<p>Modelo que representa los sprints del proyecto.</p>
 <dl class="exception">
 <dt id="core.models.Sprint.DoesNotExist">
 <em class="property">exception </em><code class="descname">DoesNotExist</code><a class="headerlink" href="#core.models.Sprint.DoesNotExist" title="Permalink to this definition">¶</a></dt>
@@ -903,6 +977,11 @@ one-to-one relation.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="core.models.UserStory.get_absolute_url">
+<code class="descclassname">UserStory.</code><code class="descname">get_absolute_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/models.html#UserStory.get_absolute_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.models.UserStory.get_absolute_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="core.models.UserStory.get_estado_actividad_display">
 <code class="descclassname">UserStory.</code><code class="descname">get_estado_actividad_display</code><span class="sig-paren">(</span><em>*moreargs</em>, <em>**morekwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#core.models.UserStory.get_estado_actividad_display" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -930,6 +1009,11 @@ one-to-one relation.</p>
 <dl class="attribute">
 <dt id="core.models.UserStory.objects">
 <code class="descclassname">UserStory.</code><code class="descname">objects</code><em class="property"> = &lt;django.db.models.manager.Manager object&gt;</em><a class="headerlink" href="#core.models.UserStory.objects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="core.models.UserStory.progreso">
+<code class="descclassname">UserStory.</code><code class="descname">progreso</code><a class="headerlink" href="#core.models.UserStory.progreso" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

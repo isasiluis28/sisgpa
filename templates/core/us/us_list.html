@@ -11,9 +11,10 @@
 {% block inside_content %}
     <h4><strong>Proyecto: </strong><td>{{ view.project }}</td></h4>
 
-    {% if "create_us" in proyecto_perms %}<p><a href="{% url 'us_create' view.project.id %}" class="fa fa-plus-circle"> Agregar</a></p>{% endif %}
+
 
     <h3>User Stories</h3>
+     {% if "create_us" in proyecto_perms %}<p><a href="{% url 'us_create' view.project.id %}" class="fa fa-plus-circle"> Agregar User Story</a></p>{% endif %}
     <!-- Buscador -->
     <form id="buscador" action="" class="styled" method="post">
         <div class="form-group">

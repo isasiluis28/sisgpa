@@ -896,7 +896,7 @@ y luego redirige a la url exitosa.</div></blockquote>
 <dt id="core.views.sprint_views.SprintCreate">
 <em class="property">class </em><code class="descclassname">core.views.sprint_views.</code><code class="descname">SprintCreate</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/sprint_views.html#SprintCreate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.sprint_views.SprintCreate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#core.views.views.ActiveProjectRequiredMixin" title="core.views.views.ActiveProjectRequiredMixin"><code class="xref py py-class docutils literal"><span class="pre">core.views.views.ActiveProjectRequiredMixin</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">guardian.mixins.LoginRequiredMixin</span></code>, <a class="reference internal" href="#core.views.views.CreateViewMixin" title="core.views.views.CreateViewMixin"><code class="xref py py-class docutils literal"><span class="pre">core.views.views.CreateViewMixin</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">django.views.generic.edit.CreateView</span></code></p>
-<p>Vista para agregar un Sprint en el sistema y añadir este sprint, un desarrollador y una actividad al user Story.</p>
+<p>Vista para agregar un Sprint en el sistema y añadir este sprint, un desarrollador y una actividad al user Story</p>
 <dl class="attribute">
 <dt id="core.views.sprint_views.SprintCreate.form_class">
 <code class="descname">form_class</code><a class="headerlink" href="#core.views.sprint_views.SprintCreate.form_class" title="Permalink to this definition">¶</a></dt>
@@ -906,16 +906,9 @@ y luego redirige a la url exitosa.</div></blockquote>
 <dl class="method">
 <dt id="core.views.sprint_views.SprintCreate.form_valid">
 <code class="descname">form_valid</code><span class="sig-paren">(</span><em>form</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/sprint_views.html#SprintCreate.form_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.sprint_views.SprintCreate.form_valid" title="Permalink to this definition">¶</a></dt>
-<dd><p>guarda el desarrolador, actividad y sprint asociado al proyecto dentro de un us.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>form</strong> &#8211; formulario del sprint.</td>
-</tr>
-</tbody>
-</table>
-<p>:return:URL de evento correcto,</p>
+<dd><p>Guarda el desarrollador, actividad y sprint asociado al un projecto dentro de un User Story
+:param form: formulario del sprint
+:return: vuelve a la pagina de detalle del sprint o renderea la pagina marcando los errores para volver a enviar sin errores</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -927,33 +920,24 @@ y luego redirige a la url exitosa.</div></blockquote>
 <dl class="method">
 <dt id="core.views.sprint_views.SprintCreate.get_context_data">
 <code class="descname">get_context_data</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/sprint_views.html#SprintCreate.get_context_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.sprint_views.SprintCreate.get_context_data" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div>Agrega el contexto de los formsets formados por desarrolladores, flujos, userstories.</div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kwargs</strong> &#8211; args extra.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">el contexto necesario para los datos.</td>
-</tr>
-</tbody>
-</table>
+<dd><p>Agregar datos al contexto como los desarrolladores del projecto, el flujo y los userStory
+:param:<a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs : argumentos clave
+:return: retorna el contexto</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.views.sprint_views.SprintCreate.get_initial">
+<code class="descname">get_initial</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/sprint_views.html#SprintCreate.get_initial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.sprint_views.SprintCreate.get_initial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Datos iniciales para el formulario
+:return: diccionario de datos</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="core.views.sprint_views.SprintCreate.get_permission_object">
 <code class="descname">get_permission_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/sprint_views.html#SprintCreate.get_permission_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.sprint_views.SprintCreate.get_permission_object" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div>Obtener el permiso de un objeto.</div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">retorna el objeto proyecto donde se comprueba el permiso.</td>
-</tr>
-</tbody>
-</table>
+<dd><p>Obtener el permiso de un objeto
+:param: self
+:return: retorna el objeto proyecto donde se comprueba el permiso</p>
 </dd></dl>
 
 <dl class="method">
@@ -964,14 +948,7 @@ y luego redirige a la url exitosa.</div></blockquote>
 <dl class="method">
 <dt id="core.views.sprint_views.SprintCreate.get_success_url">
 <code class="descname">get_success_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/sprint_views.html#SprintCreate.get_success_url"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.sprint_views.SprintCreate.get_success_url" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">la url de redireccion a la vista  de los detalles del sprint agregado.</td>
-</tr>
-</tbody>
-</table>
+<dd><p>:return:la url de redireccion a la vista de los detalles del sprint agregado.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -982,12 +959,12 @@ y luego redirige a la url exitosa.</div></blockquote>
 
 <dl class="attribute">
 <dt id="core.views.sprint_views.SprintCreate.permission_required">
-<code class="descname">permission_required</code><em class="property"> = 'core.create_sprint'</em><a class="headerlink" href="#core.views.sprint_views.SprintCreate.permission_required" title="Permalink to this definition">¶</a></dt>
+<code class="descname">permission_required</code><em class="property"> = 'project.create_sprint'</em><a class="headerlink" href="#core.views.sprint_views.SprintCreate.permission_required" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="core.views.sprint_views.SprintCreate.project">
-<code class="descname">project</code><em class="property"> = None</em><a class="headerlink" href="#core.views.sprint_views.SprintCreate.project" title="Permalink to this definition">¶</a></dt>
+<dt id="core.views.sprint_views.SprintCreate.proyecto">
+<code class="descname">proyecto</code><em class="property"> = None</em><a class="headerlink" href="#core.views.sprint_views.SprintCreate.proyecto" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1225,7 +1202,7 @@ y luego redirige a la url exitosa.</div></blockquote>
 <dl class="function">
 <dt id="core.views.sprint_views.sprint_create">
 <code class="descclassname">core.views.sprint_views.</code><code class="descname">sprint_create</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#core.views.sprint_views.sprint_create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Vista para agregar un Sprint en el sistema y añadir este sprint, un desarrollador y una actividad al user Story.</p>
+<dd><p>Vista para agregar un Sprint en el sistema y añadir este sprint, un desarrollador y una actividad al user Story</p>
 </dd></dl>
 
 <dl class="function">
@@ -1369,6 +1346,58 @@ y luego redirige a la url exitosa.</div></blockquote>
 <dl class="attribute">
 <dt id="core.views.us_views.DeleteUserStory.template_name">
 <code class="descname">template_name</code><em class="property"> = 'core/us/us_delete.html'</em><a class="headerlink" href="#core.views.us_views.DeleteUserStory.template_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="core.views.us_views.RegistrarActividadUserStory">
+<em class="property">class </em><code class="descclassname">core.views.us_views.</code><code class="descname">RegistrarActividadUserStory</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/us_views.html#RegistrarActividadUserStory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.us_views.RegistrarActividadUserStory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#core.views.views.ActiveProjectRequiredMixin" title="core.views.views.ActiveProjectRequiredMixin"><code class="xref py py-class docutils literal"><span class="pre">core.views.views.ActiveProjectRequiredMixin</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">guardian.mixins.LoginRequiredMixin</span></code>, <code class="xref py py-class docutils literal"><span class="pre">django.views.generic.edit.UpdateView</span></code></p>
+<p>View que permite registrar los cambios aplicados a un user story</p>
+<dl class="attribute">
+<dt id="core.views.us_views.RegistrarActividadUserStory.error_template">
+<code class="descname">error_template</code><em class="property"> = 'core/us/us_error.html'</em><a class="headerlink" href="#core.views.us_views.RegistrarActividadUserStory.error_template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.views.us_views.RegistrarActividadUserStory.form_valid">
+<code class="descname">form_valid</code><span class="sig-paren">(</span><em>form</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/us_views.html#RegistrarActividadUserStory.form_valid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.us_views.RegistrarActividadUserStory.form_valid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.views.us_views.RegistrarActividadUserStory.get_context_data">
+<code class="descname">get_context_data</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/us_views.html#RegistrarActividadUserStory.get_context_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.us_views.RegistrarActividadUserStory.get_context_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.views.us_views.RegistrarActividadUserStory.get_form">
+<code class="descname">get_form</code><span class="sig-paren">(</span><em>form_class=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/us_views.html#RegistrarActividadUserStory.get_form"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.us_views.RegistrarActividadUserStory.get_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Personalización del form retornado</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.views.us_views.RegistrarActividadUserStory.get_form_class">
+<code class="descname">get_form_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/us_views.html#RegistrarActividadUserStory.get_form_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.us_views.RegistrarActividadUserStory.get_form_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retorna el tipo de formulario que se mostrará en el template. En caso de que
+el usuario cuente con el permiso de editar userstory se le permitirá cambiar la actividad
+del User Story.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.views.us_views.RegistrarActividadUserStory.get_proyecto">
+<code class="descname">get_proyecto</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/views/us_views.html#RegistrarActividadUserStory.get_proyecto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.views.us_views.RegistrarActividadUserStory.get_proyecto" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="core.views.us_views.RegistrarActividadUserStory.model">
+<code class="descname">model</code><a class="headerlink" href="#core.views.us_views.RegistrarActividadUserStory.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal"><span class="pre">UserStory</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.views.us_views.RegistrarActividadUserStory.template_name">
+<code class="descname">template_name</code><em class="property"> = 'core/us/us_regactivity_form.html'</em><a class="headerlink" href="#core.views.us_views.RegistrarActividadUserStory.template_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

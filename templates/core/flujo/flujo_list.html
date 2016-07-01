@@ -8,6 +8,9 @@
 {% endblock %}
 
 {% block before_table %}
+    <div class="col-lg-15">
+				<h1 class="page-header">Flujos</h1>
+        </div>
     <h4><strong>Proyecto: </strong><td>{{ view.project }}</td></h4>
     {% if "create_flujo" in proyecto_perms %}<p><a href="{% url 'flujo_create' view.project.id %}" class="fa fa-plus-circle"> Agregar</a></p>{% endif %}
 {#    {% if "create_flujo" in proyecto_perms %}<p><a href="#" class="fa fa-clipboard"> Crear desde plantilla</a></p>{% endif %}#}

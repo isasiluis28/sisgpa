@@ -82,6 +82,9 @@
 
 <div class="viewcode-block" id="get_selected_perms"><a class="viewcode-back" href="../../../core.views.html#core.views.views.get_selected_perms">[docs]</a><span class="k">def</span> <span class="nf">get_selected_perms</span><span class="p">(</span><span class="n">POST</span><span class="p">):</span>
     <span class="n">perm_list</span> <span class="o">=</span> <span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;perms_proyecto&#39;</span><span class="p">)</span>
+    <span class="n">perm_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;perms_us&#39;</span><span class="p">))</span>
+    <span class="n">perm_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;perms_flujo&#39;</span><span class="p">))</span>
+    <span class="n">perm_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;perms_sprint&#39;</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">perm_list</span></div>
 
 

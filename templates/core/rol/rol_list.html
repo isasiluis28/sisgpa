@@ -8,8 +8,11 @@
 {% endblock %}
 
 {% block before_table %}
+    <div class="col-lg-15">
+				<h1 class="page-header">Roles</h1>
+        </div>
     {% if perms.auth.add_group %}
-        <p><a href="{% url 'rol_create' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></p>
+        <p><a href="{% url 'rol_create' %}">Agregar <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></p>
     {% endif %}
 {% endblock %}
 

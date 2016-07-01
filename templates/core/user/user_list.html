@@ -6,8 +6,12 @@
 {% block usuarios_activo %}class="active"{% endblock %}
 
 {% block before_table %}
+
+    <div class="col-lg-15">
+				<h1 class="page-header">Usuarios</h1>
+        </div>
     {% if perms.auth.add_user %}
-        <p><a href="{% url 'user_create' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></p>
+        <p><a href="{% url 'user_create' %}">Agregar <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></p>
     {% endif %}
 {% endblock %}
 

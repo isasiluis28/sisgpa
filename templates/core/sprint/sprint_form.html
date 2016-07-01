@@ -1,6 +1,7 @@
 {% extends "core/sprint/base.html" %}
 {% load static %}
 {% load bootstrap3 %}
+{% block title %}Formulario Sprints{% endblock %}
 
 {% block breadcrumb %}
     <li><a href="{% url 'projects-index' %}">Proyectos</a></li>
@@ -12,9 +13,13 @@
         <li><a href="{{ view.proyecto.get_absolute_url }}">{{ view.proyecto }}</a></li>
         <li><a href="{% url 'sprint_list' view.proyecto.id %}">Sprints</a></li>
     {% endif %}
-    <li class="active">{{ current_action }}</li>
+    <li class="active">{{ current_action | title }}</li>
+    <div class="col-lg-15">
+				<h1 class="page-header">Sprint</h1>
+        </div
 {% endblock %}
 
+{% block header %}Sprint{% endblock %}
 {% block inside_extrajs %}
     <script src="{% static 'js/jquery.formset.js' %}"></script>
     <script type="text/javascript">

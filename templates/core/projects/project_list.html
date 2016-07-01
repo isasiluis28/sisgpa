@@ -7,9 +7,13 @@
 
 
 {% block before_table %}
+
+     <div class="col-lg-15">
+				<h1 class="page-header">Proyectos</h1>
+        </div>
     {% if perms.core.add_proyecto %}
         <ul class="list-inline">
-            <li><a href="{% url 'project_create' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></li>
+            <li><a href="{% url 'project_create' %}">Agregar <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a></li>
         </ul>
     {% endif %}
 

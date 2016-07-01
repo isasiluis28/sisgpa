@@ -21,6 +21,10 @@
 {% endblock %}
 
 {% block inside_content %}
+     <div class="col-lg-15">
+				<h1 class="page-header">Creacion de Proyecto</h1>
+        </div>
+
     <form role="form" method="post">
         {% csrf_token %}
         <div class="row">
@@ -51,7 +55,9 @@
                         </div>
                     {% endfor %}
                 </div>
+
             </div>
+
         </div>
 
         {% buttons submit='Guardar' reset="Reset" %}

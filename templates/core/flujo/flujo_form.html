@@ -11,7 +11,10 @@
         <li><a href="{{ view.proyecto.get_absolute_url }}">{{ view.proyecto }}</a></li>
         <li><a href="{% url 'flujo_list' view.proyecto.id %}">Flujos</a></li>
     {% endif %}
-    <li class="active">{{ current_action }}</li>
+     <li class="active">{{ current_action }}</li>
+       <div class="col-lg-15">
+				<h1 class="page-header">Flujo</h1>
+        </div>
 {% endblock %}
 
 {% block inside_extrajs %}

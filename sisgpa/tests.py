@@ -335,3 +335,57 @@ class SprintTest(TestCase):
         self.assertEquals(response.status_code, 200)
         s = Sprint.objects.first()
         self.assertIsNotNone(s)
+
+class UserStoryTest2(TestCase):
+    def setUp(self):
+        u = User.objects.create_superuser('test', 'test@test.com', 'test') #Superusuario con todos los permisos
+        u2 = User.objects.create_user('none', 'none@none.com', 'none') #Usuario sin permisos
+        pro= Proyecto.objects.create(nombre='Proyecto', estado='PE', fecha_inicio=timezone.now(), fecha_fin=timezone.now() + datetime.timedelta(days=30))
+
+    def test_add_userstory_with_permission(self):
+        c = self.client
+        login = c.login(username='test', password='test')
+        self.assertTrue(login)
+        p = Proyecto.objects.first()
+        #deberia existir
+        self.assertIsNotNone(p)
+        response = c.get(reverse('userstory_add', args=(str(p.id))))
+        self.assertEquals(response.status_code, 200, 'No se pudo redirigir correctamente a Agreagar detail')
+        response = c.post(reverse('userstory_add', args=(str(p.id))),
+            {'nombre_corto': 'Test US', 'nombre_largo': 'Test User story', 'descripcion': 'This is a User Story for testing purposes.',
+             'valor_negocio': 10, 'valor_tecnico': 10, 'tiempo_estimado': 10}, follow=True)
+        #deberia redirigir
+        us = UserStory.objects.first()
+        self.assertIsNotNone(us)
+        self.assertRedirects(response, '/userstory/{}/'.format(us.id))
+        response = c.get(reverse('userstory_detail', args=(str(us.id))))
+        self.assertEquals(response.status_code, 200, 'No se pudo redirigir correctamente a userstory detail')
+
+
+    def test_update_userstory_with_permission(self):
+        c = self.client
+        login = c.login(username='test', password='test')
+        self.assertTrue(login)
+        p = Proyecto.objects.first()
+        #creamos un user story
+        response = c.post(reverse('userstory_add', args=(str(p.id))),
+        {'nombre_corto': 'Test US', 'nombre_largo': 'Test User story', 'descripcion': 'This is a User Story for testing purposes.',
+        'valor_negocio': 10, 'valor_tecnico': 10, 'tiempo_estimado': 10}, follow=True)
+        us = UserStory.objects.first()
+        self.assertIsNotNone(us)
+        self.assertEquals(us.nombre_corto, 'Test US')
+        response = c.get(reverse('userstory_detail', args=(str(us.id))))
+        self.assertEquals(response.status_code, 200, 'No se pudo redirigir correctamente a userstory detail')
+        #nos vamos a la página de edición de user story
+        response = c.get(reverse('userstory_update', args=(str(us.id))))
+        #debería retornar 200
+        self.assertEquals(response.status_code, 200, 'No se pudo redirigir correctamente a editar user Story')
+        response = c.post(reverse('userstory_update', args=(str(us.id))),
+         {'nombre_corto': 'Test US2', 'nombre_largo': 'Test User story2', 'descripcion': 'This is a User Story2 for testing purposes.',
+        'valor_negocio': 10, 'valor_tecnico': 10, 'tiempo_estimado': 10}, follow=True)
+        us = UserStory.objects.first()
+        self.assertIsNotNone(us)
+        self.assertRedirects(response, '/userstory/{}/'.format(us.id))
+        #vemos que el nombre ya no es el anterior
+        self.assertNotEquals(us.nombre_corto, 'Test US1')
+        self.assertEquals(us.nombre_corto, 'Test US2')

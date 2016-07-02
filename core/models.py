@@ -266,3 +266,53 @@ from core.signals import add_permissions_team_member
 m2m_changed.connect(add_permissions_team_member, sender=MiembroEquipo.roles.through,
                     dispatch_uid='add_permissions_signal')
 
+class Nota(models.Model):
+    """
+    Manejo de notas adjuntas relacionadas a un User Story, estás entradas representan
+    constancias de los cambios, como cantidad de horas trabajadas, en un user story.
+    """
+    estado_choices = ((0, 'Inactivo'), (1, 'En curso'), (2, 'Pendiente Aprobacion'), (3, 'Aprobado'), (4,'Cancelado'),)
+    mensaje = models.TextField(help_text='Mensaje de descripcion de los avances o motivo de cancelacion', null=True, blank=True)
+    fecha = models.DateTimeField(default=timezone.now)
+    tiempo_registrado = models.IntegerField(default=0)
+    horas_a_registrar = models.IntegerField(default=0)
+    desarrollador = models.ForeignKey(User, null=True)
+    sprint = models.ForeignKey(Sprint, null=True)
+    actividad = models.ForeignKey(Actividad, null=True)
+    estado = models.IntegerField(choices=estado_choices, default=0)
+    estado_actividad = models.IntegerField(choices=UserStory.estado_actividad_choices, null=True)
+    user_story = models.ForeignKey(UserStory)
+
+    def __unicode__(self):
+        return '{}({}): {}'.format(self.desarrollador, self.fecha, self.horas_a_registrar)
+
+
+class Adjunto(models.Model):
+    """
+    Modelo para la administración de archivos adjuntos a un User Story.
+    """
+    tipo_choices = [('img', 'Imagen'), ('text', 'Texto'), ('misc', 'Otro'), ('src', 'Codigo')]
+    lang_choices = [('clike', 'C'), ('python', 'Python'), ('ruby', 'Ruby'), ('css', 'CSS'), ('php', 'PHP'),
+                    ('scala', 'Scala'), ('sql', 'SQL'), ('bash', 'Bash'), ('javascript', 'JavaScript'),
+                    ('markup', 'Markup')]
+    nombre = models.CharField(max_length=20)
+    descripcion = models.TextField()
+    filename = models.CharField(max_length=100, null=True, editable=False)
+    binario = models.BinaryField(null=True, blank=True)
+    content_type = models.CharField(null=True, editable=False, max_length=50)
+    creacion = models.DateTimeField(auto_now_add=True)
+    user_story = models.ForeignKey(UserStory)
+    tipo = models.CharField(choices=tipo_choices, default='misc', max_length=10)
+    lenguaje = models.CharField(choices=lang_choices, null=True, max_length=10)
+
+    def __unicode__(self):
+        return self.nombre
+
+    def img64(self):
+        return b64encode(force_bytes(self.binario))
+
+    def get_absolute_url(self):
+        return reverse_lazy('project:file_detail', args=[self.pk])
+
+    def get_download_url(self):
+        return reverse_lazy('project:download_attachment', args=[self.pk])
